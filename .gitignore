@@ -1,0 +1,12 @@
+EncryptHelper/
+GameTest/
+Gui/
+ImageEffects/
+NPCScript/
+other/
+Shader/
+SLUSBXpress/
+
+*.meta
+*.scc
+*.controller
