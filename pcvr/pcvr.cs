@@ -712,6 +712,7 @@ public class pcvr : MonoBehaviour {
 	public static bool IsJiOuJiaoYanFailed;
 	byte EndRead_1 = 0x41;
 	byte EndRead_2 = 0x42;
+
 	public void GetMessage()
 	{
 		if (!MyCOMDevice.ComThreadClass.IsReadComMsg) {
@@ -722,25 +723,27 @@ public class pcvr : MonoBehaviour {
 			return;
 		}
 
-		if (MyCOMDevice.ComThreadClass.ReadByteMsg.Length < (MyCOMDevice.ComThreadClass.BufLenRead - MyCOMDevice.ComThreadClass.BufLenReadEnd)) {
+        if (MyCOMDevice.ComThreadClass.ReadByteMsg.Length < (MyCOMDevice.ComThreadClass.BufLenRead - MyCOMDevice.ComThreadClass.BufLenReadEnd)) {
 			//Debug.Log("ReadBufLen was wrong! len is "+MyCOMDevice.ComThreadClass.ReadByteMsg.Length);
 			return;
 		}
 
-		if (IsJiOuJiaoYanFailed) {
+        if (IsJiOuJiaoYanFailed) {
 			return;
 		}
 
-		if ((MyCOMDevice.ComThreadClass.ReadByteMsg[22]&0x01) == 0x01) {
+        // 协议规定 0x22 为偶数表示正常，为奇数表示 Io 板自身有问题
+        if ((MyCOMDevice.ComThreadClass.ReadByteMsg[22]&0x01) == 0x01) {
 			JiOuJiaoYanCount++;
 			if (JiOuJiaoYanCount >= JiOuJiaoYanMax && !IsJiOuJiaoYanFailed) {
 				IsJiOuJiaoYanFailed = true;
 				//JiOuJiaoYanFailed
 			}
 		}
-		//IsJiOuJiaoYanFailed = true; //test
+        //IsJiOuJiaoYanFailed = true; //test
 
-		byte tmpVal = 0x00;
+        // 全包(但跳过一些特定字节)做校验
+        byte tmpVal = 0x00;
 		string testA = "";
 		for (int i = 2; i < (MyCOMDevice.ComThreadClass.BufLenRead - 4); i++) {
 			if (i == 8 || i == 21) {
@@ -754,18 +757,18 @@ public class pcvr : MonoBehaviour {
 		testA += EndRead_1 + " ";
 		testA += EndRead_2 + " ";
 
-		if (tmpVal != MyCOMDevice.ComThreadClass.ReadByteMsg[21]) {
-			if (MyCOMDevice.ComThreadClass.IsStopComTX) {
-				return;
-			}
-			MyCOMDevice.ComThreadClass.IsStopComTX = true;
+        if (tmpVal != MyCOMDevice.ComThreadClass.ReadByteMsg[21]) {            
+            if (MyCOMDevice.ComThreadClass.IsStopComTX) {
+                return;
+			}            
+            MyCOMDevice.ComThreadClass.IsStopComTX = true;
 //			ScreenLog.Log("testA: "+testA);
 //			ScreenLog.LogError("tmpVal: "+tmpVal.ToString("X2")+", byte[21] "+MyCOMDevice.ComThreadClass.ReadByteMsg[21].ToString("X2"));
 //			ScreenLog.Log("byte21 was wrong!");
 			return;
 		}
 
-		if (IsJiaoYanHid) {
+        if (IsJiaoYanHid) {
 			tmpVal = 0x00;
 //			string testStrA = MyCOMDevice.ComThreadClass.ReadByteMsg[30].ToString("X2") + " ";
 //			string testStrB = "";
@@ -791,7 +794,7 @@ public class pcvr : MonoBehaviour {
 //				testStrA += MyCOMDevice.ComThreadClass.ReadByteMsg[i].ToString("X2") + " ";
 			}
 
-			if (tmpVal == MyCOMDevice.ComThreadClass.ReadByteMsg[10]) {
+            if (tmpVal == MyCOMDevice.ComThreadClass.ReadByteMsg[10]) {
 				bool isJiaoYanDtSucceed = false;
 				tmpVal = 0x00;
 				for (int i = 15; i < 18; i++) {
@@ -800,9 +803,10 @@ public class pcvr : MonoBehaviour {
 				
 				//校验2...
 				if ( tmpVal == MyCOMDevice.ComThreadClass.ReadByteMsg[14]
-				    && (JiaoYanDt[1]&0xef) == MyCOMDevice.ComThreadClass.ReadByteMsg[15]
+                //  校验，烦，去掉
+				/*  && (JiaoYanDt[1]&0xef) == MyCOMDevice.ComThreadClass.ReadByteMsg[15]
 				    && (JiaoYanDt[2]&0xfe) == MyCOMDevice.ComThreadClass.ReadByteMsg[16]
-				    && (JiaoYanDt[3]|0x28) == MyCOMDevice.ComThreadClass.ReadByteMsg[17] ) {
+				    && (JiaoYanDt[3]|0x28) == MyCOMDevice.ComThreadClass.ReadByteMsg[17] */ ) {
 					isJiaoYanDtSucceed = true;
 				}
 
@@ -840,7 +844,9 @@ public class pcvr : MonoBehaviour {
 //			}
 		}
 
-		CheckIsPlayerActivePcvr();
+        //Debug.Log("GetMessage() -> 9");
+
+        CheckIsPlayerActivePcvr();
 		int len = MyCOMDevice.ComThreadClass.ReadByteMsg.Length;
 		uint[] readMsg = new uint[len];
 		for (int i = 0; i < len; i++) {
@@ -1299,14 +1305,19 @@ public class pcvr : MonoBehaviour {
 	public static uint BikeBeiYongPowerCurPcvr;
 	void KeyProcess(uint []buffer)
 	{
-		if (!MyCOMDevice.IsFindDeviceDt) {
+        //Debug.Log("KeyProcess() -> 1");
+        if (!MyCOMDevice.IsFindDeviceDt) {
 			return;
 		}
 
-		if (buffer[0] != ReadHead_1 || buffer[1] != ReadHead_2) {
+        //Debug.Log("KeyProcess() -> 2");
+
+        if (buffer[0] != ReadHead_1 || buffer[1] != ReadHead_2) {
 			return;
 		}
-		SteerValCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //fangXiang
+
+        //Debug.Log("KeyProcess() -> 3");
+        SteerValCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //fangXiang
 		bool isTest = false;
 		if (!isTest) {
 			BikePowerCur = ((buffer[2]&0x0f) << 8) + buffer[3]; //youMen
@@ -1325,23 +1336,24 @@ public class pcvr : MonoBehaviour {
 			BikeBeiYongPowerCurPcvr = tmpBYYouMen;
 		}
 
-//		if (!IsInitYouMenJiaoZhun) {
-//			float dPower = BikePowerOld > BikePowerCur ? BikePowerOld - BikePowerCur : BikePowerCur - BikePowerOld;
-//			if (mBikePowerMax > mBikePowerMin) {
-//				if (dPower / (mBikePowerMax - mBikePowerMin) > 0.3f) {
-//					BikePowerCur = mBikePowerMin;
-//				}
-//			}
-//			else {
-//				if (dPower / (mBikePowerMin - mBikePowerMax) > 0.3f) {
-//					BikePowerCur = mBikePowerMax;
-//				}
-//			}
-//			BikePowerOld = BikePowerCur;
-//		}
-		
-		//game coinInfo
-		CoinCurPcvr = buffer[8];
+        //		if (!IsInitYouMenJiaoZhun) {
+        //			float dPower = BikePowerOld > BikePowerCur ? BikePowerOld - BikePowerCur : BikePowerCur - BikePowerOld;
+        //			if (mBikePowerMax > mBikePowerMin) {
+        //				if (dPower / (mBikePowerMax - mBikePowerMin) > 0.3f) {
+        //					BikePowerCur = mBikePowerMin;
+        //				}
+        //			}
+        //			else {
+        //				if (dPower / (mBikePowerMin - mBikePowerMax) > 0.3f) {
+        //					BikePowerCur = mBikePowerMax;
+        //				}
+        //			}
+        //			BikePowerOld = BikePowerCur;
+        //		}
+
+        //Debug.Log("KeyProcess() -> 4");
+        //game coinInfo
+        CoinCurPcvr = buffer[8];
 		if (CoinCurPcvr > 0) {
 			if (!IsCleanHidCoin) {
 				IsCleanHidCoin = true;
@@ -1351,69 +1363,88 @@ public class pcvr : MonoBehaviour {
 			}
 		}
 
-		if (bIsJiaoYanBikeValue) {
+        //Debug.Log("KeyProcess() -> 5");
+        if (bIsJiaoYanBikeValue) {
 			FangXiangJiaoZhun();
 			YouMenJiaoZhun();
 			ShaCheJiaoZhun();
 		}
 
-		if ( !IsCloseDongGanBtDown && 0x02 == (buffer[9]&0x02) ) {
-//			ScreenLog.Log("game DongGanBt down!");
-			IsCloseDongGanBtDown = true;
+        //Debug.Log("KeyProcess() -> buffer[9] : " + buffer[9] + ", IsCloseDongGanBtDown : " + IsCloseDongGanBtDown);
+        if ( !IsCloseDongGanBtDown && 0x02 == (buffer[9]&0x02) ) {
+            // ScreenLog.Log("game DongGanBt down!");
+            Debug.Log("game DongGanBt down!");
+            IsCloseDongGanBtDown = true;
 			InputEventCtrl.GetInstance().ClickCloseDongGanBt( ButtonState.DOWN );
 		}
 		else if ( IsCloseDongGanBtDown && 0x00 == (buffer[9]&0x02) ) {
-//			ScreenLog.Log("game DongGanBt up!");
-			IsCloseDongGanBtDown = false;
+            // ScreenLog.Log("game DongGanBt up!");
+            Debug.Log("game DongGanBt up!");
+            IsCloseDongGanBtDown = false;
 			InputEventCtrl.GetInstance().ClickCloseDongGanBt( ButtonState.UP );
 		}
-		
-		//if ( !bPlayerStartKeyDown && 0x01 == (buffer[28]&0x01) ) { //test
-		if ( !bPlayerStartKeyDown && 0x01 == (buffer[9]&0x01) ) {
-//			ScreenLog.Log("game startBt down!");
-			bPlayerStartKeyDown = true;
+
+        //Debug.Log("KeyProcess() -> 6");
+        //if ( !bPlayerStartKeyDown && 0x01 == (buffer[28]&0x01) ) { //test
+        if ( !bPlayerStartKeyDown && 0x01 == (buffer[9]&0x01) ) {
+            //ScreenLog.Log("game startBt down!");
+            Debug.Log("game startBt down!");
+            bPlayerStartKeyDown = true;
 			InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.DOWN );
 		}
 		//else if ( bPlayerStartKeyDown && 0x00 == (buffer[28]&0x01) ) { //test
 		else if ( bPlayerStartKeyDown && 0x00 == (buffer[9]&0x01) ) {
-//			ScreenLog.Log("game startBt up!");
-			bPlayerStartKeyDown = false;
+            //ScreenLog.Log("game startBt up!");
+            Debug.Log("game startBt up!");
+            bPlayerStartKeyDown = false;
 			InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.UP );
 		}
 
-		if ( !bSetEnterKeyDown && 0x10 == (buffer[9]&0x10) ) {
+        //Debug.Log("KeyProcess() -> 7");
+        if ( !bSetEnterKeyDown && 0x10 == (buffer[9]&0x10) ) {
 			bSetEnterKeyDown = true;
-//			ScreenLog.Log("game setEnterBt down!");
-			InputEventCtrl.GetInstance().ClickSetEnterBt( ButtonState.DOWN );
+            //ScreenLog.Log("game setEnterBt down!");
+            Debug.Log("game setEnterBt down!");
+            InputEventCtrl.GetInstance().ClickSetEnterBt( ButtonState.DOWN );
 		}
 		else if ( bSetEnterKeyDown && 0x00 == (buffer[9]&0x10) ) {
 			bSetEnterKeyDown = false;
-//			ScreenLog.Log("game setEnterBt up!");
-			InputEventCtrl.GetInstance().ClickSetEnterBt( ButtonState.UP );
+			//ScreenLog.Log("game setEnterBt up!");
+            Debug.Log("game setEnterBt up!");
+            InputEventCtrl.GetInstance().ClickSetEnterBt( ButtonState.UP );
 		}
 
-		if ( !bSetMoveKeyDown && 0x20 == (buffer[9]&0x20) ) {
+        //Debug.Log("KeyProcess() -> 8");
+        if ( !bSetMoveKeyDown && 0x20 == (buffer[9]&0x20) ) {
 			bSetMoveKeyDown = true;
-//			ScreenLog.Log("game setMoveBt down!");
-			InputEventCtrl.GetInstance().ClickSetMoveBt( ButtonState.DOWN );
+            // ScreenLog.Log("game setMoveBt down!");
+            Debug.Log("game setMoveBt down!");
+            InputEventCtrl.GetInstance().ClickSetMoveBt( ButtonState.DOWN );
 		}
 		else if( bSetMoveKeyDown && 0x00 == (buffer[9]&0x20) ) {
 			bSetMoveKeyDown = false;
-//			ScreenLog.Log("game setMoveBt up!");
-			InputEventCtrl.GetInstance().ClickSetMoveBt( ButtonState.UP );
+            // ScreenLog.Log("game setMoveBt up!");
+            Debug.Log("game setMoveBt up!");
+            InputEventCtrl.GetInstance().ClickSetMoveBt( ButtonState.UP );
 		}
 
-		if ( !IsClickLaBaBt && 0x04 == (buffer[9]&0x04) ) {
+        //Debug.Log("KeyProcess() -> 9");
+
+        if ( !IsClickLaBaBt && 0x04 == (buffer[9]&0x04) ) {
 			IsClickLaBaBt = true;
-//			ScreenLog.Log("game LaBaBt down!");
-			InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.DOWN );
+            //			ScreenLog.Log("game LaBaBt down!");
+            Debug.Log("game LaBaBt down!");
+            InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.DOWN );
 		}
 		else if( IsClickLaBaBt && 0x00 == (buffer[9]&0x04) ) {
 			IsClickLaBaBt = false;
-//			ScreenLog.Log("game LaBaBt up!");
-			InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.UP );
+            // ScreenLog.Log("game LaBaBt up!");
+            Debug.Log("game LaBaBt up!");
+            InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.UP );
 		}
-	}
+
+        Debug.Log("KeyProcess() -> 10");
+    }
 
 	public static bool IsPlayerActivePcvr = true;
 	public static float TimeLastActivePcvr;
