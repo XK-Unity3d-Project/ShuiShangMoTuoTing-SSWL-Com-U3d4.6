@@ -131,7 +131,7 @@ public class pcvr : MonoBehaviour {
 		BikeShaCheLen = Math.Max(1, BikeShaCheLen);
 		
 		InitFangXiangPowerOpen();
-	}
+    }
 
 	void Update()
 	{
@@ -1442,8 +1442,6 @@ public class pcvr : MonoBehaviour {
             Debug.Log("game LaBaBt up!");
             InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.UP );
 		}
-
-        Debug.Log("KeyProcess() -> 10");
     }
 
 	public static bool IsPlayerActivePcvr = true;

@@ -24,75 +24,38 @@ public static class gkioutil {
 public class GkioPort
 {
     [DllImport("gkio", EntryPoint = "gkio_open", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int _gkio_open();
+    public static extern int gkio_open();
 
     [DllImport("gkio", EntryPoint = "gkio_read", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int _gkio_read(byte[] read_buf, int read_buf_size);
+    public static extern int gkio_read(byte[] read_buf, int read_buf_size);
 
     [DllImport("gkio", EntryPoint = "gkio_write", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int _gkio_write(byte[] write_buf, int write_buf_size);
+    public static extern int gkio_write(byte[] write_buf, int write_buf_size);
 
     [DllImport("gkio", EntryPoint = "gkio_close", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void _gkio_close();
+    public static extern void gkio_close();
 
     public GkioPort() {
         IsOpen_ = false;
-        //Debug.Log("GkioPort() created.");
+        Debug.Log("GkioPort() created.");
     }
 
     ~GkioPort()
     {
-        //Debug.Log("GkioPort() destroyed.");
+        Debug.Log("GkioPort() destroyed.");
     }
 
     private bool IsOpen_ = false;
     public bool IsOpen { get { return IsOpen_; } }
 
-    public int gkio_open()
-    {        
-        int ret = _gkio_open();
-
-        Debug.Log("gkio_open() called. num of board : " + ret);
-
-        return ret;
-    }
-
-    public int gkio_read(byte[] read_buf, int read_buf_size)
+    static public int gkio_write_read(byte[] write_buf, byte[] read_buf)
     {
         int ret;
 
-        ret = _gkio_read(read_buf, read_buf_size);
-
-        Debug.Log("_gkio_read() read bytes or error code : " + ret);
-        gkioutil.output_array("_gkio_read()", read_buf);
-        
-        return ret;
-    }
-
-    public int gkio_write(byte[] write_buf, int write_buf_size)
-    {
-        int ret;
-
-        gkioutil.output_array("_gkio_write()", write_buf);
-        ret = _gkio_write(write_buf, write_buf.Length);
-
-        return ret;
-    }
-
-    public void gkio_close()
-    {
-        Debug.Log("gkio_close() called.");
-        _gkio_close();
-    }
-
-    public int gkio_write_read(byte[] write_buf, byte[] read_buf)
-    {
-        int ret;
-
-        ret = _gkio_write(write_buf, write_buf.Length);
+        ret = gkio_write(write_buf, write_buf.Length);
 
         if (ret >= 0) {
-            ret = _gkio_read(read_buf, read_buf.Length);
+            ret = gkio_read(read_buf, read_buf.Length);
         }
 
         return ret;
@@ -105,8 +68,7 @@ public class GkioPort
 
         IsOpen_ = (num_of_gkio != 0);
 
-        // 初始化方向盘到自动回中。后续应该有详细参数设置
-        //SetWheel(0x55);
+        Debug.Log("Open() called and num_of_gkio is : " + num_of_gkio);
     }
 
     public void Close()
@@ -116,140 +78,298 @@ public class GkioPort
         }
     }
 
-    private byte[] wbuf = new byte[16];
-    private byte[] rbuf = new byte[16];
+    private static byte[] wbuf = new byte[16];
+    private static byte[] rbuf = new byte[16];
 
     // 把摩托艇程序写入的 buffer 数据包，转换成 GKIO 识别的包格式 wbuf
     void EncodeToGkio(byte[] buffer, byte[] wbuf)
     {
-
+        
     }
 
-    void SubCoin(byte numToSub)
+    // 扣币
+    private void SubCoin(byte numToSub)
     {
         if (numToSub <= 0) {
-            Debug.Log("SubCoin() called but num is O so just return.");
             return;
         }
 
         byte[] CMD_SUB_COIN = {  // 减币指令，币数待填写
-                0x61, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-            };
+            0x61, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
 
         CMD_SUB_COIN[3] = numToSub;
 
-        gkio_write(CMD_SUB_COIN, CMD_SUB_COIN.Length);
-
         // 返回的 rbuf[0] 应该是 0x82
-        gkio_read(rbuf, rbuf.Length);
+        gkio_write_read(CMD_SUB_COIN, rbuf);
     }
 
-    void SetWheel(byte wheelStat)
+    // 初始化方向盘的状态，回中位置等。一般方向盘的位置在 0xAA 附近
+    public void InitWheel(uint knuWheelCenter)
     {
-        {
-            byte[] CMD_SET_WHEEL = {  // 方向盘力反馈指令
-                0x21, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        byte[] CMD_SET_WHEEL = {  // 方向盘力反馈指令
+                0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
 
-            // 方向盘作用边界（这个有点不清楚啊）
-            CMD_SET_WHEEL[1] = 0xA9;
-            CMD_SET_WHEEL[2] = 0xAA;
-
-            // 特定模式下，还可以在 3 和 4 字节继续细分方向盘力道, 范围 0 到 0x0388
-            CMD_SET_WHEEL[3] = 0x03;
-            CMD_SET_WHEEL[4] = 0x64;
-
-            // 设置为正常模式，力道强
-            CMD_SET_WHEEL[5] = 0x03;
-
-            gkio_write(CMD_SET_WHEEL, CMD_SET_WHEEL.Length);
-
-            // 返回的 rbuf[0] 应该是 0x21
-            gkio_read(rbuf, rbuf.Length);
-        }
-/*
-        {
-            byte[] CMD_WHEEL_FORCE = {  // 方向盘电机功率。0 为关闭，0x64 为全功率
-                0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-            };
-
-            switch (wheelStat) {
-                case 0x00: // 关闭方向盘力反馈功能                
-                    CMD_WHEEL_FORCE[1] = 0x00;
-                    CMD_WHEEL_FORCE[2] = 0x00;
-                    break;
-                case 0xaa: // 打开方向盘力反馈功能
-                    CMD_WHEEL_FORCE[1] = 0x00;
-                    CMD_WHEEL_FORCE[2] = 0x64;
-                    break;
-            }
-
-            gkio_write(CMD_WHEEL_FORCE, CMD_WHEEL_FORCE.Length);
-
-            // 返回的 rbuf[0] 应该是 0x28
-            gkio_read(rbuf, rbuf.Length);
+        // 目前 Io 板上的 STM32 芯片的 ADC 硬件测量结果不可能大于 0xFFE
+        const int MAX_ADC_RANGE = 0xFFE;
+        if (knuWheelCenter > MAX_ADC_RANGE) {
+            knuWheelCenter = MAX_ADC_RANGE;
         }
 
-        {
-            if (wheelStat == 0x55) {
-                // 振动方向盘
-                byte[] CMD_SHAKE_WHEEL = {  // 振动一下方向盘，碰到石头了什么的
-                    0x24, 0x02, 0x00, 0x00, 0x05, 0x03, 0xE8, 0x0A,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                };
+        // knuIo 板的方向盘中间位置，是 12 bit 的，Gkio 板只支持 8 bit 数据
+        byte GkioCenter = (byte)(knuWheelCenter >> 4);
+        // 方向盘作用边界
+        CMD_SET_WHEEL[1] = (byte)(GkioCenter - 1);
+        CMD_SET_WHEEL[2] = GkioCenter;
 
-                gkio_write(CMD_SHAKE_WHEEL, CMD_SHAKE_WHEEL.Length);
+        // 特定模式下，还可以在 3 和 4 字节继续细分方向盘力道, 范围 0 到 0x0388
+        CMD_SET_WHEEL[3] = 0x03;
+        CMD_SET_WHEEL[4] = 0x64;
 
-                // 返回的 rbuf[0] 应该是 0x28
-                gkio_read(rbuf, rbuf.Length);
-            }
-        }
-*/
+        // 设置为正常模式，力道强
+        CMD_SET_WHEEL[5] = 0x03;
+
+        // 返回的 rbuf[0] 应该是 0x21
+        //int ret = gkio_write_read(CMD_SET_WHEEL, rbuf);
+
+        int ret1 = gkio_write(CMD_SET_WHEEL, 16);
+        int ret2 = gkio_read(rbuf, 16);
+
+        Debug.Log("InitWheel() called. knuWheelCenter : " + knuWheelCenter +
+            ", GkioCenter : " + GkioCenter);
+        Debug.Log("CMD_SET_WHEEL[1] : " + CMD_SET_WHEEL[1] +
+            ", CMD_SET_WHEEL[2] : " + CMD_SET_WHEEL[2] +
+            ", ret1 : " + ret1 + ", ret2 : " + ret2);
     }
 
-    public void Write(byte[] buf, int offset, int count)
+    // force 在 0 到 900 之间
+    private static void setMoterPower(uint force)
     {
-        // buffer[2 - 3] 是减币
-        if (buf[2] == 0xaa) {
-            SubCoin(buf[3]);
+        byte[] CMD_WHEEL_FORCE = {  // 方向盘电机功率。0 为关闭，0x388 为全功率
+            0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        if (force > 900) {
+            force = 900;
         }
 
-        // buf[4] 是气囊和开始灯
+        CMD_WHEEL_FORCE[1] = (byte)(force / 256);
+        CMD_WHEEL_FORCE[2] = (byte)(force % 256);
 
-        // buf[6] 是方向盘振动和力
-        SetWheel(buf[6]);
-
-        // buf[7] 是尾灯
+        // 返回的 rbuf[0] 应该是 0x28
+        gkio_write_read(CMD_WHEEL_FORCE, rbuf);
     }
 
-    void FillPktHeadAndTail(byte[] buf)
+    private static void shakeWheel()
+    {
+        // 振动一下方向盘，碰到石头了什么的
+        byte[] CMD_SHAKE_WHEEL = {
+            0x24, 0x02, 0x00, 0x00, 0x05, 0x03, 0xE8, 0x0A,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        // 返回的 rbuf[0] 应该是 0x28
+        gkio_write_read(CMD_SHAKE_WHEEL, rbuf);
+    }
+
+    private static void turnOnLed(byte idx)
+    {
+        byte[] CMD_LED_ON = {
+            0x61, 0x81, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        if (idx < 0 || idx > 10) {
+            idx = 0;
+        }
+
+        CMD_LED_ON[2] = idx;
+
+        // 返回的 rbuf[0] 应该是 0x81
+        gkio_write_read(CMD_LED_ON, rbuf);
+    }
+
+    private static void turnOffLed(byte idx)
+    {
+        byte[] CMD_LED_OFF = {
+            0x61, 0x81, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        if (idx < 0 || idx > 10) {
+            idx = 0;
+        }
+
+        CMD_LED_OFF[2] = idx;
+
+        // 返回的 rbuf[0] 应该是 0x81
+        gkio_write_read(CMD_LED_OFF, rbuf);
+    }
+
+    enum GASCELL_STAT { ON = 0, OFF = 1 };
+    private static void setGascell(byte gascell)
+    {
+        if ((gascell & 0x01) > 0) {
+            turnOnLed(1);
+        }
+        else {
+            turnOffLed(1);
+        }
+
+        if ((gascell & 0x02) > 0) {
+            turnOnLed(2);
+        }
+        else {
+            turnOffLed(2);
+        }
+
+        if ((gascell & 0x04) > 0) {
+            turnOnLed(3);
+        }
+        else {
+            turnOffLed(3);
+        }
+
+        if ((gascell & 0x08) > 0) {
+            turnOnLed(4);
+        }
+        else {
+            turnOffLed(4);
+        }
+
+        if ((gascell & 0x40) > 0) {
+            turnOnLed(5);
+        }
+        else {
+            turnOffLed(5);
+        }
+    }
+
+    private void setLight(byte light)
+    {
+        switch (light) {
+            case 0x00:
+                turnOffLed(0);
+                break;
+            case 0x55:
+            case 0xaa:
+                turnOnLed(0);
+                break;
+        }
+    }
+
+    // KnuIo 板数据包
+    public void Write(byte[] knuPkt, int offset, int count)
+    {
+        // knuPkt[2 - 3] 是减币
+        if (knuPkt[2] == 0xaa) {
+            SubCoin(knuPkt[3]);
+        }
+
+        InitWheel(pcvr.SteerValCen);
+
+        /*
+        // knuPkt[4] 是气囊和开始灯
+        setGascell(knuPkt[4]);
+
+        // knuPkt[6] 是方向盘振动和力
+        const uint MOTOR_POWER_OFF = 0;
+        const uint MOTOR_FULL_POWER = 900;
+
+        switch (knuPkt[6]) {
+            case 0x00:  // Demo 状态下，关闭电机电源，方向盘不自动回中
+                setMoterPower(MOTOR_POWER_OFF);
+                break;
+            case 0x55:  // 振动一次
+                shakeWheel();
+                break;            
+            case 0xff:  // 开始游戏，打开电机电源，方向盘自动回中
+                setMoterPower(MOTOR_FULL_POWER);
+                break;
+            default:    // 到这里说明出错，为了安全，先关闭电机
+                setMoterPower(MOTOR_POWER_OFF);
+                break;
+        }
+
+        // knuPkt[7] 是尾灯
+        setLight(knuPkt[7]);
+        */
+    }
+
+    private void FillPktHeadAndTail(byte[] knuPkt)
     {
         // 指定的包头
-        buf[0] = 0x01;
-        buf[1] = 0x55;
+        knuPkt[0] = 0x01;
+        knuPkt[1] = 0x55;
 
-        // 指定的包尾
-        buf[23] = 0x41;
-        buf[24] = 0x42;
-        buf[25] = 0x43;
-        buf[26] = 0x44;
+        // 指定的包尾 'ABCD'
+        knuPkt[23] = 0x41;
+        knuPkt[24] = 0x42;
+        knuPkt[25] = 0x43;
+        knuPkt[26] = 0x44;
+    }
+
+    private void FillChecksum(byte[] knuPkt)
+    {
+        // 偶数表示 KnuIo 板正常，奇数表示不正常
+        knuPkt[22] = 0x02;
+
+        // 校验 11 - 14 字节
+        {
+            byte tmpXorChecksum = 0x00;
+
+            tmpXorChecksum ^= knuPkt[11];
+            tmpXorChecksum ^= knuPkt[12];
+            tmpXorChecksum ^= knuPkt[13];
+
+            knuPkt[10] = tmpXorChecksum;
+        }
+
+        // 校验 15 - 17 字节
+        {
+            byte tmpXorChecksum = 0x00;
+
+            tmpXorChecksum ^= knuPkt[15];
+            tmpXorChecksum ^= knuPkt[16];
+            tmpXorChecksum ^= knuPkt[17];
+
+            knuPkt[14] = tmpXorChecksum;
+        }
+
+        // 总校验
+        {
+            byte tmpXorChecksum = 0x00;
+            for (int idx = 2; idx < knuPkt.Length - 4; idx++) {
+                if (idx == 8 || idx == 21) {
+                    continue;
+                }
+                tmpXorChecksum ^= knuPkt[idx];
+            }
+
+            // 0x41 和 0x42 没什么特别，协议就是这么规定的
+            tmpXorChecksum ^= 0x41; // EndRead_1;
+            tmpXorChecksum ^= 0x42; // EndRead_2;
+
+            knuPkt[21] = tmpXorChecksum;
+        }
     }
 
     // 把读到的 GKIO 包 gkio[] 转换成摩托艇程序能识别的格式，放到 buf[] 中
-    void DecodeGkioToKnuIo(byte[] gkio, byte[] speedboat)
+    private void DecodeGkioToKnuIo(byte[] gkio, byte[] knuPkt)
     {
-        Array.Clear(speedboat, 0, speedboat.Length);
+        Array.Clear(knuPkt, 0, knuPkt.Length);
 
         // 填充包头包尾
-        FillPktHeadAndTail(speedboat);
+        FillPktHeadAndTail(knuPkt);
 
         // GKIO 当前的 coin 数量，直接转换到摩托艇需要的格式
         {
             byte gkioCoin = gkio[1];
-            speedboat[8] = gkioCoin;
+            knuPkt[8] = gkioCoin;
         }
 
         // GKIO 的 4 - 7 字节都可以定义为按钮。我们选用 gkio[4] 和 gkio[5]，并转换到摩托艇需要的格式
@@ -291,77 +411,24 @@ public class GkioPort
 
             // gkio[7] 是板子上的拨码开关，支持使用拨码开关操作，便于调试和场地客人排错
             // 合成为 1 个 byte，放到摩托艇的 button 状态字节
-            //speedboat[9] = (byte)(gkioPlayerBtn | gkioServiceBtn);
-            speedboat[9] = (byte)((~gkio[7]) | gkioButton);
-
-            // GKIO : 80 00 00 00 FD FF FF FF 03 03 03 03 00 00 00 00
-            // 解析出的 speedboat[9] : 2, gkioPlayerBtn : 2, gkioServiceBtn : 0
-            /*Debug.Log("speedboat[9] : " + speedboat[9] + 
-                ", gkioPlayerBtn : " + gkioPlayerBtn +
-                ", gkioServiceBtn : " + gkioServiceBtn); */
-
-            // Debug.Log("speedboat[9] : " + speedboat[9]);
+            knuPkt[9] = (byte)((~gkio[7]) | gkioButton);
         }
 
         // GKIO 读出的 3 个 8 bit 电位器数据 byte[8] byte[9] byte[10]，要转换成摩托艇的
-        // 4 bit 高位 +8 bit 低位的 12 位格式。为了扩大精度，最后 4 bit 取 0
+        // 4 bit 高位 +8 bit 低位的 12 位格式。为了扩大精度到 12 bit，最后 4 bit 取 0
         {
             byte wheel = gkio[8];
-            speedboat[6] = (byte)(wheel >> 4); // 方向盘
-            speedboat[7] = (byte)(wheel << 4);
+            knuPkt[6] = (byte)(wheel >> 4); // 方向盘
+            knuPkt[7] = (byte)(wheel << 4);
 
             byte thrust = gkio[9];
-            speedboat[2] = (byte)(thrust >> 4);  // 油门
-            speedboat[3] = (byte)(thrust << 4);
+            knuPkt[2] = (byte)(thrust >> 4);  // 油门
+            knuPkt[3] = (byte)(thrust << 4);
 
-            /*
-            byte breaker = gkio[9];
-            speedboat[4] = (byte)(breaker >> 4);  // 刹车
-            speedboat[5] = (byte)(breaker << 4);
-            */
+            // 摩托艇没有刹车            
         }
 
-        // 偶数表示 KnuIo 板正常，奇数表示不正常
-        speedboat[22] = 0x02;
-
-        // 校验 11 - 14 字节
-        {
-            byte tmpXorChecksum = 0x00;
-
-            tmpXorChecksum ^= speedboat[11];
-            tmpXorChecksum ^= speedboat[12];
-            tmpXorChecksum ^= speedboat[13];
-
-            speedboat[10] = tmpXorChecksum;
-        }
-
-        // 校验 15 - 17 字节
-        {
-            byte tmpXorChecksum = 0x00;
-
-            tmpXorChecksum ^= speedboat[15];
-            tmpXorChecksum ^= speedboat[16];
-            tmpXorChecksum ^= speedboat[17];
-
-            speedboat[14] = tmpXorChecksum;
-        }
-
-        // 总校验
-        {
-            byte tmpXorChecksum = 0x00;
-            for (int idx = 2; idx < speedboat.Length - 4; idx++) {
-                if (idx == 8 || idx == 21) {
-                    continue;
-                }
-                tmpXorChecksum ^= speedboat[idx];
-            }
-
-            // 0x41 和 0x42 没什么特别，协议就是这么规定的
-            tmpXorChecksum ^= 0x41; // EndRead_1;
-            tmpXorChecksum ^= 0x42; // EndRead_2;
-
-            speedboat[21] = tmpXorChecksum;
-        }
+        FillChecksum(knuPkt);
     }
 
     private byte[] gkio_read_buf = new byte[16];
@@ -377,8 +444,7 @@ public class GkioPort
                     0x61, 0x8A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
                 };
-            gkio_write(CMD_GET_STAT, CMD_GET_STAT.Length);
-            gkio_read(gkio_read_buf, gkio_read_buf.Length);
+            gkio_write_read(CMD_GET_STAT, gkio_read_buf);            
         }
 
         // 80 38 38 38 FF FF FF FF 03 03 03 03 00 00 00 00
@@ -406,7 +472,7 @@ public class MyCOMDevice : MonoBehaviour
 	{
 		public string ThreadName;
         //static SerialPort _SerialPortTmp;
-        static GkioPort _SerialPort;
+        private static GkioPort _SerialPort;
         public static int BufLenRead = 27;
 		public static int BufLenReadEnd = 4;
 		public static  int BufLenWrite = 23;
@@ -424,13 +490,14 @@ public class MyCOMDevice : MonoBehaviour
 		public static int WriteCount;
 		public static int ReadCount;
 		public static int ReadTimeOutCount;
+
 		public ComThreadClass(string name)
 		{
 			ThreadName = name;
 			OpenComPort();
 		}
 
-		public static void OpenComPort()
+        public static void OpenComPort()
 		{
 			if (!pcvr.bIsHardWare) {
 				return;
@@ -457,7 +524,7 @@ public class MyCOMDevice : MonoBehaviour
 						if (_SerialPort.IsOpen) {
 							IsFindDeviceDt = true;
 							Debug.Log("COM open sucess");
-						}
+                        }
 					}
 				}
 				catch (Exception exception)
@@ -599,9 +666,9 @@ public class MyCOMDevice : MonoBehaviour
 		}
 		return _Instance;
 	}
-
-	// Use this for initialization
-	void Start()
+    
+    // Use this for initialization
+    void Start()
 	{
 		StartCoroutine(OpenComThread());
 	}
