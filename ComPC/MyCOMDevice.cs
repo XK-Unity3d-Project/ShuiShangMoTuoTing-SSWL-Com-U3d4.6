@@ -287,7 +287,7 @@ public class GkioPort
             case 0x55:  // 振动一次
                 shakeWheel();
                 break;            
-            case 0xff:  // 开始游戏，打开电机电源，方向盘自动回中
+            case 0xaa:  // 开始游戏，打开电机电源，方向盘自动回中
                 setMoterPower(MOTOR_FULL_POWER);
                 break;
             default:    // 到这里说明出错，为了安全，先关闭电机
