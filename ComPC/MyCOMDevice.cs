@@ -105,13 +105,18 @@ public class GkioPort
     // 初始化方向盘的状态，回中位置等。一般方向盘的位置在 0xAA 附近
     // 正常情况下，设置方向盘的初始参数，这个初始化动作，应该在 Open() 打开端口
     // 以后，做一次就行了。但是那样会出错，所有后续读 gkio 板都返回全 0
-    // 计划所以只能在每一次 write 到 gkio 的时候调用 InitWheel。通过标记来保证
-    // 只执行一次，但还是不灵，IO 经常会出错
+    // 所以只能在每一次 write 到 gkio 的时候反复调用 InitWheel。
+    // 通过 wheelInited 标记来保证只执行一次，但还是不灵，IO 经常会出错，返回 -5
     public void InitWheel(uint knuWheelCenter)
     {
+        // 回中的意思是回到 "方向盘左边界" 和 "方向盘右边界" 指定的一个小区域
         byte[] CMD_SET_WHEEL = {  // 方向盘力反馈指令
-            0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            0x21,        // 包头
+            0x00,        // 方向盘左边界
+            0x00,        // 方向盘右边界
+            0x00, 0x00,  // 方向盘力道
+            0x00,        // 方向盘类型
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
         // 目前 Io 板上的 STM32 芯片的 ADC 硬件测量结果不可能大于 0xFFE
@@ -127,11 +132,11 @@ public class GkioPort
         CMD_SET_WHEEL[2] = GkioCenter;
 
         // 特定模式下，还可以在 3 和 4 字节继续细分方向盘力道, 范围 0 到 0x0388
-        CMD_SET_WHEEL[3] = 0x03;
+        CMD_SET_WHEEL[3] = 0x02;
         CMD_SET_WHEEL[4] = 0x64;
 
         // 设置为正常模式，力道强
-        CMD_SET_WHEEL[5] = 0x03;
+        CMD_SET_WHEEL[5] = 0x02;
 
         // 返回的 rbuf[0] 应该是 0x21
         int ret = gkio_write_read(CMD_SET_WHEEL, rbuf);
@@ -166,7 +171,7 @@ public class GkioPort
         };
         */
 
-        byte[] CMD_SHAKE_WHEEL = {
+        byte[] CMD_SHAKE_WHEEL = { // 这个振动感觉稍好
             0x23, 0x02, 0x00, 0x00, 0x05, 0x03, 0xE8, 0x0A,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
@@ -175,55 +180,105 @@ public class GkioPort
         gkio_write_read(CMD_SHAKE_WHEEL, rbuf);
     }
 
-    private static void turnOnLed(byte idx)
+    private static void turnOutputOn(byte idx)
     {
-        byte[] CMD_LED_ON = {
+        byte[] CMD_OUTPUT_ON = {
             0x61, 0x81, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        if (idx < 0 || idx > 10) {
-            idx = 0;
-        }
-
-        CMD_LED_ON[2] = idx;
+        CMD_OUTPUT_ON[2] = idx;
+        CMD_OUTPUT_ON[3] = 0xff;
 
         // 返回的 rbuf[0] 应该是 0x81
-        gkio_write_read(CMD_LED_ON, rbuf);
+        gkio_write_read(CMD_OUTPUT_ON, rbuf);
     }
 
-    private static void turnOffLed(byte idx)
+    private static void turnOutputOff(byte idx)
     {
-        byte[] CMD_LED_OFF = {
-            0x61, 0x81, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00,
+        byte[] CMD_OUTPUT_OFF = {
+            0x61, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        if (idx < 0 || idx > 10) {
-            idx = 0;
-        }
-
-        CMD_LED_OFF[2] = idx;
+        CMD_OUTPUT_OFF[2] = idx;
+        CMD_OUTPUT_OFF[3] = 0x00;
 
         // 返回的 rbuf[0] 应该是 0x81
-        gkio_write_read(CMD_LED_OFF, rbuf);
+        gkio_write_read(CMD_OUTPUT_OFF, rbuf);
     }
 
-    enum GASCELL_STAT { ON = 0, OFF = 1 };
     private static void setGascell(byte gascell)
     {
+        bool gascell_1 = ((gascell & 0x01) == 0x01);
+        if (gascell_1) {
+            turnOutputOn(18);
+        }
+        else {
+            turnOutputOff(18);
+        }
 
+        bool gascell_2 = ((gascell & 0x02) == 0x02);
+        if (gascell_2) {
+            turnOutputOn(19);
+        }
+        else {
+            turnOutputOff(19);
+        }
+
+        bool gascell_3 = ((gascell & 0x04) == 0x04);
+        if (gascell_3) {
+            turnOutputOn(20);
+        }
+        else {
+            turnOutputOff(20);
+        }
+
+        bool gascell_4 = ((gascell & 0x08) == 0x08);
+        if (gascell_4) {
+            turnOutputOn(21);
+        }
+        else {
+            turnOutputOff(21);
+        }
     }
 
+    private void initOutputPower()
+    {
+        byte[] CMD_OUTPUT_POWER = {
+            0x61, 0x91, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        byte[] wbuf = new byte[16];
+        byte[] rbuf = new byte[16];
+
+        Array.Copy(CMD_OUTPUT_POWER, wbuf, 16);
+
+        for (byte idx = 18; idx <= 22; ++idx) {
+            wbuf[2] = idx;
+
+            // 亮度 50,000
+            wbuf[3] = 0xC3;
+            wbuf[4] = 0x50;
+
+            gkio_write_read(wbuf, rbuf);
+        }
+    }
+
+    /* Gkio 板有 0 到 39 共 40 个输出。我们把气囊接在 18 19 20 21 号输出，LED 灯接在 22 号输出 */
     private void setLight(byte light)
     {
+        const byte LED_LIGHT_IDX = 22;
         switch (light) {
             case 0x00:
-                turnOffLed(0);
+                turnOutputOff(LED_LIGHT_IDX);
                 break;
             case 0x55:
+                turnOutputOn(LED_LIGHT_IDX);
+                break;
             case 0xaa:
-                turnOnLed(0);
+                turnOutputOn(LED_LIGHT_IDX);
                 break;
         }
     }
@@ -239,13 +294,13 @@ public class GkioPort
         InitWheel(pcvr.SteerValCen);
 
         // knuPkt[4] 是气囊和开始灯
-        //setGascell(knuPkt[4]);
+        setGascell(knuPkt[4]);
 
         // knuPkt[6] 是方向盘振动和力
         const byte MOTOR_POWER_OFF = 0;
-        const byte MOTOR_FULL_POWER = 100;
+        const byte MOTOR_FULL_POWER = 65;
 
-        Debug.Log(String.Format("Write() called. The wheel power byte is : {0:X2}", knuPkt[6]));
+        //Debug.Log(String.Format("Write() called. The wheel power byte is : {0:X2}", knuPkt[6]));
 
         switch (knuPkt[6]) {
             case 0x00:  // Demo 状态下，关闭电机电源，方向盘不自动回中
@@ -263,7 +318,7 @@ public class GkioPort
         }
 
         // knuPkt[7] 是尾灯
-        //setLight(knuPkt[7]);
+        setLight(knuPkt[7]);
     }
 
     private void FillPktHeadAndTail(byte[] knuPkt)
@@ -415,7 +470,7 @@ public class GkioPort
         }
 
         // 80 38 38 38 FF FF FF FF 03 03 03 03 00 00 00 00
-        gkioutil.output_array("READ() gkio buf : ", gkio_read_buf);
+        //gkioutil.output_array("READ() gkio buf : ", gkio_read_buf);
 
         DecodeGkioToKnuIo(gkio_read_buf, buf);
 
@@ -429,7 +484,7 @@ public class GkioPort
         // 32, byte[21] 校验和，应该为 31
         // 02, 必须为偶数
         // 41 42 43 44 包尾
-        gkioutil.output_array("READ() KnuIo buf : ", buf);
+        //gkioutil.output_array("READ() KnuIo buf : ", buf);
     }
 }
 
