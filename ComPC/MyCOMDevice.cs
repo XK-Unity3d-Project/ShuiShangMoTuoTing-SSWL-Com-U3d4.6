@@ -78,12 +78,6 @@ public class GkioPort
     private static byte[] wbuf = new byte[16];
     private static byte[] rbuf = new byte[16];
 
-    // 把摩托艇程序写入的 buffer 数据包，转换成 GKIO 识别的包格式 wbuf
-    void EncodeToGkio(byte[] buffer, byte[] wbuf)
-    {
-        
-    }
-
     // 扣币
     private void SubCoin(byte numToSub)
     {
@@ -119,13 +113,14 @@ public class GkioPort
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        // 目前 Io 板上的 STM32 芯片的 ADC 硬件测量结果不可能大于 0xFFE
-        const int MAX_ADC_RANGE = 0xFFE;
-        if (knuWheelCenter > MAX_ADC_RANGE) {
-            knuWheelCenter = MAX_ADC_RANGE;
+        // Knu Io 板上 STM32 芯片的 ADC 硬件是 12-bit 测量结果不可能大于 0xFFE
+        const int ADC_UPPER_LIMIT = 0xFFE;
+        if (knuWheelCenter > ADC_UPPER_LIMIT) {
+            knuWheelCenter = ADC_UPPER_LIMIT;
         }
 
         // knuIo 板的方向盘中间位置，是 12 bit 的，Gkio 板只支持 8 bit 数据
+        // 所以舍去低 4 位 Gkio 才能理解。程序关心的是比例，绝对数值不重要
         byte GkioCenter = (byte)(knuWheelCenter >> 4);
         // 方向盘作用边界
         CMD_SET_WHEEL[1] = (byte)(GkioCenter - 1);
@@ -180,6 +175,7 @@ public class GkioPort
         gkio_write_read(CMD_SHAKE_WHEEL, rbuf);
     }
 
+    // Gkio 有 0 - 39 共 40 组输出，所以 idx 要在这个范围内
     private static void turnOutputOn(byte idx)
     {
         byte[] CMD_OUTPUT_ON = {
@@ -208,6 +204,7 @@ public class GkioPort
         gkio_write_read(CMD_OUTPUT_OFF, rbuf);
     }
 
+    // 开始灯
     private static void setGascell(byte gascell)
     {
         bool gascell_1 = ((gascell & 0x01) == 0x01);
@@ -243,6 +240,7 @@ public class GkioPort
         }
     }
 
+    // 输出的强度，范围从 0 到 60000。推动气囊控制板的继电器和 LED 灯
     private void initOutputPower()
     {
         byte[] CMD_OUTPUT_POWER = {
@@ -255,6 +253,7 @@ public class GkioPort
 
         Array.Copy(CMD_OUTPUT_POWER, wbuf, 16);
 
+        // 气囊接在 18 19 20 21 号输出，LED 灯接在 22 号输出
         for (byte idx = 18; idx <= 22; ++idx) {
             wbuf[2] = idx;
 
@@ -266,7 +265,7 @@ public class GkioPort
         }
     }
 
-    /* Gkio 板有 0 到 39 共 40 个输出。我们把气囊接在 18 19 20 21 号输出，LED 灯接在 22 号输出 */
+    // Gkio 板有 0 到 39 共 40 个输出。我们把气囊接在 18 19 20 21 号输出，LED 灯接在 22 号输出
     private void setLight(byte light)
     {
         const byte LED_LIGHT_IDX = 22;
@@ -298,7 +297,7 @@ public class GkioPort
 
         // knuPkt[6] 是方向盘振动和力
         const byte MOTOR_POWER_OFF = 0;
-        const byte MOTOR_FULL_POWER = 65;
+        const byte MOTOR_FULL_POWER = 65;  // 玩家反映设为 100 满载时力太大
 
         //Debug.Log(String.Format("Write() called. The wheel power byte is : {0:X2}", knuPkt[6]));
 
@@ -456,7 +455,7 @@ public class GkioPort
     public void Read(byte[] buf, int offset, int count)
     {
         if (buf.Length != 27) {
-            Debug.Log("buf.Length must be 27, but it is : " + buf.Length + ", count is : " + count);
+            //Debug.Log("buf.Length must be 27, but it is : " + buf.Length + ", count is : " + count);
             return;
         }
 
@@ -475,7 +474,7 @@ public class GkioPort
         DecodeGkioToKnuIo(gkio_read_buf, buf);
 
         // 01 55, 包头
-        // 00 30 00 30 00 30, 三个电位器, 03 变 30，正确
+        // 00 30 00 30 00 30, 三个电位器, 03 变 30，8-bit 转 12-bit，正确
         // 38, 币数
         // 00, 按钮状态，正常
         // 00 00 00 00, byte[10] 校验和
@@ -568,13 +567,13 @@ public class MyCOMDevice : MonoBehaviour
 			do
 			{
                 /*
-                // 禁止这条，可玩 1 局，然后 IO 板失灵
+                // 禁止这条，摩托艇可玩 1 局，然后 IO 板失灵
 				if (XkGameCtrl.IsLoadingLevel) {
 					Thread.Sleep(100);
 					continue;
 				}
 
-                // 禁止后面这 2 条，全程可玩，但不知道有没有副作用?
+                // 禁止后面这 2 条，摩托艇全程可玩，但不知道有没有副作用?
                 IsTestWRPer = false;
 				if (IsReadMsgComTimeOut) {
 					CloseComPort();
@@ -585,7 +584,7 @@ public class MyCOMDevice : MonoBehaviour
 					IsReadComMsg = false;
 					Thread.Sleep(1000);
 					continue;
-				}                
+				}
                 */
 
                 COMTxData();
