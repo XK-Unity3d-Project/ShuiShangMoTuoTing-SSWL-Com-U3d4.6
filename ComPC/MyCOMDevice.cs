@@ -37,12 +37,12 @@ public class GkioPort
 
     public GkioPort() {
         IsOpen_ = false;
-        Debug.Log("GkioPort() created.");
+        //Debug.Log("GkioPort() created.");
     }
 
     ~GkioPort()
     {
-        Debug.Log("GkioPort() destroyed.");
+        //Debug.Log("GkioPort() destroyed.");
     }
 
     private bool IsOpen_ = false;
@@ -65,7 +65,7 @@ public class GkioPort
 
         IsOpen_ = (num_of_gkio != 0);
 
-        Debug.Log("Open() called and num_of_gkio is : " + num_of_gkio);
+        //Debug.Log("Open() called and num_of_gkio is : " + num_of_gkio);
     }
 
     public void Close()
@@ -379,7 +379,7 @@ public class GkioPort
     }
 
     // 把读到的 GKIO 包 gkio[] 转换成摩托艇程序能识别的格式，放到 buf[] 中
-    private void DecodeGkioToKnuIo(byte[] gkio, byte[] knuPkt)
+    private void DecodeGkioToKnuIo(byte[] gkioPkt, byte[] knuPkt)
     {
         Array.Clear(knuPkt, 0, knuPkt.Length);
 
@@ -388,7 +388,7 @@ public class GkioPort
 
         // GKIO 当前的 coin 数量，直接转换到摩托艇需要的格式
         {
-            byte gkioCoin = gkio[1];
+            byte gkioCoin = gkioPkt[1];
             knuPkt[8] = gkioCoin;
         }
 
@@ -399,7 +399,7 @@ public class GkioPort
 
             // 注意 GKIO 是 1 表示未按，0 表示按下，所以要 ~ 取反
             // 第 4 个字节，玩家可用按钮，1 - 测试, 3 - 下移, 4 - 投币
-            byte tmpButton = (byte)(~gkio[4]);
+            byte tmpButton = (byte)(~gkioPkt[4]);
 
             const byte MASK_TEST = 0x02;  // 0000,0010
             if ((byte)(tmpButton & MASK_TEST) == MASK_TEST) {
@@ -415,14 +415,14 @@ public class GkioPort
 
             // 投币是由固件直接转换成币数，放在第 1 个字节
 
-            tmpButton = (byte)(~gkio[5]);
+            tmpButton = (byte)(~gkioPkt[5]);
             const byte MASK_SPEAKER = 0x20;
             if ((byte)(tmpButton & MASK_SPEAKER) == MASK_SPEAKER) {
                 // gkio 的 bit 1 对应 knuio 的 bit 5
                 gkioButton |= 0x04;
             }
 
-            tmpButton = (byte)(~gkio[5]);
+            tmpButton = (byte)(~gkioPkt[5]);
             const byte MASK_START = 0x40;
             if ((byte)(tmpButton & MASK_START) == MASK_START) {
                 // gkio 的 bit 1 对应 knuio 的 bit 5
@@ -431,21 +431,21 @@ public class GkioPort
 
             // gkio[7] 是板子上的拨码开关，支持使用拨码开关操作，便于调试和场地客人排错
             // 合成为 1 个 byte，放到摩托艇的 button 状态字节
-            knuPkt[9] = (byte)((~gkio[7]) | gkioButton);
+            knuPkt[9] = (byte)((~gkioPkt[7]) | gkioButton);
         }
 
         // GKIO 读出的 3 个 8 bit 电位器数据 byte[8] byte[9] byte[10]，要转换成摩托艇的
         // 4 bit 高位 +8 bit 低位的 12 位格式。为了扩大精度到 12 bit，最后 4 bit 取 0
         {
-            byte wheel = gkio[8];
-            knuPkt[6] = (byte)(wheel >> 4); // 方向盘
-            knuPkt[7] = (byte)(wheel << 4);
+            byte wheel = gkioPkt[8];
+            knuPkt[6] = (byte)(wheel >> 4);   // 方向盘高位
+            knuPkt[7] = (byte)(wheel << 4);   // 方向盘低位，最低 4-bit 补 0
 
-            byte thrust = gkio[9];
+            byte thrust = gkioPkt[9];
             knuPkt[2] = (byte)(thrust >> 4);  // 油门
             knuPkt[3] = (byte)(thrust << 4);
 
-            // 摩托艇没有刹车            
+            // 摩托艇没有刹车，跳过了
         }
 
         FillChecksum(knuPkt);
