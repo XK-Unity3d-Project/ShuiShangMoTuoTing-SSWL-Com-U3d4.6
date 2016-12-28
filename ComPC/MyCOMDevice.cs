@@ -28,7 +28,7 @@ public class GkioPort
 
     // 经实测，_gkio_write 写入命令，然后 _gkio_read 读取返回数据，Win7 下，
     // 运行   1000 次，耗时  2013 毫秒
-    // 运行 1,0000 次，耗时 20139 / 20155 毫秒
+    // 运行 1,0000 次，耗时 20139 / 20155 /20109 毫秒
     [DllImport("gkio", EntryPoint = "gkio_read", CallingConvention = CallingConvention.Cdecl)]
     public static extern int _gkio_read(byte[] read_buf, int read_buf_size);
 
