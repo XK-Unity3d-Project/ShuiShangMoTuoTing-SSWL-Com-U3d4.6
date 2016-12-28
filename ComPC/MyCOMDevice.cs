@@ -24,7 +24,7 @@ public static class gkioutil {
 public class GkioPort
 {
     [DllImport("gkio", EntryPoint = "gkio_open", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int gkio_open();
+    public static extern int _gkio_open();
 
     // 经实测，_gkio_write 写入命令，然后 _gkio_read 读取返回数据，Win7 下，
     // 运行   1000 次，耗时  2013 毫秒
@@ -36,7 +36,7 @@ public class GkioPort
     public static extern int _gkio_write(byte[] write_buf, int write_buf_size);
 
     [DllImport("gkio", EntryPoint = "gkio_close", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void gkio_close();
+    public static extern void _gkio_close();
 
     public GkioPort() {
         IsOpen_ = false;
@@ -64,7 +64,7 @@ public class GkioPort
     public void Open()
     {
         // 返回找到的 GKIO 板数量。目前没找到返回 0，找到 1 个或多个，都返回 1。只支持使用第一块板
-        int num_of_gkio = gkio_open();
+        int num_of_gkio = _gkio_open();
 
         IsOpen_ = (num_of_gkio != 0);
 
@@ -74,7 +74,7 @@ public class GkioPort
     public void Close()
     {
         if (IsOpen_) {
-            gkio_close();
+            _gkio_close();
         }
     }
 
