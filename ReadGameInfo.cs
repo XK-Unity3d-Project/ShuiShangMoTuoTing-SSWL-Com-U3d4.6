@@ -18,13 +18,18 @@ public class ReadGameInfo : MonoBehaviour
 	int GameAudioVolume;
 	#if USE_HANDLE_JSON
 	static HandleJson PHandleJson;
-	static string FileName = "XKGameConfig.xml";
+	static string FilePath = Application.dataPath+"/../config";
+	static string FileName = "../config/XKGameConfig.xml";
 	#endif
 	static public ReadGameInfo GetInstance()
 	{
 		if (Instance == null) {
 			#if USE_HANDLE_JSON
 			PHandleJson = HandleJson.GetInstance();
+			if (!Directory.Exists(FilePath)) {
+				//如果不存在就创建file文件夹.
+				Directory.CreateDirectory(FilePath);
+			}
 			#endif
 			GameObject obj = new GameObject("_ReadGameInfo");
 			DontDestroyOnLoad(obj);
@@ -59,12 +64,6 @@ public class ReadGameInfo : MonoBehaviour
 		}
 		PlayerMinSpeedVal = value;
 
-		if (!PlayerPrefs.HasKey("GameAudioVolume")) {
-			PlayerPrefs.SetInt("GameAudioVolume", 7);
-			PlayerPrefs.Save();
-		}
-
-		
 		#if USE_HANDLE_JSON
 		string readInfo = PHandleJson.ReadFromFileXml(FileName, "GameAudioVolume");
 		if (readInfo == null || readInfo == "") {
@@ -78,6 +77,11 @@ public class ReadGameInfo : MonoBehaviour
 			PHandleJson.WriteToFileXml(FileName, "GameAudioVolume", value.ToString());
 		}
 		#else
+		if (!PlayerPrefs.HasKey("GameAudioVolume")) {
+			PlayerPrefs.SetInt("GameAudioVolume", 7);
+			PlayerPrefs.Save();
+		}
+
 		value = PlayerPrefs.GetInt("GameAudioVolume");
 		if (value < 0 || value > 10) {
 			value = 7;
