@@ -2,16 +2,18 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.IO;
 
 public class ReadGameInfo : MonoBehaviour 
 {
 	static private ReadGameInfo Instance = null;
 	private HandleJson handleJsonObj;
-	public string m_pStarCoinNum = "";
-	public string m_pGameMode = "";
-	public string m_pInsertCoinNum = "0";
-	int GameRecordVal;
-	int PlayerMinSpeedVal = 0;
+	private string m_pStarCoinNum = "";
+	private string m_pGameMode = "";
+	private string m_pInsertCoinNum = "0";
+
+	private int GameRecordVal;
+	private int PlayerMinSpeedVal = 0;
 	/**
 	 * 游戏音量(0-10).
 	 */
