@@ -23,10 +23,45 @@ public class ReadGameInfo : MonoBehaviour
     private void ItemToProperty(string name, string value)
     {
         try {
-            /*if (String.Equals(name, "coin_to_start")) {
-                coin_to_start = int.Parse(value);
+            if (String.Equals(name, "CoinToStart")) {
+                CoinToStart = int.Parse(value);
             }
-            */
+            if (String.Equals(name, "GameMode")) {
+                GameMode = int.Parse(value);
+            }
+            if (String.Equals(name, "InsertCoin")) {
+                InsertCoin = int.Parse(value);
+            }
+            if (String.Equals(name, "GameRecord")) {
+                GameRecord = int.Parse(value);
+            }
+            if (String.Equals(name, "PlayerSpeedMin")) {
+                PlayerSpeedMin = int.Parse(value);
+            }
+            if (String.Equals(name, "AudioVolume")) {
+                AudioVolume = int.Parse(value);
+            }
+            if (String.Equals(name, "SteerMin")) {
+                SteerMin = int.Parse(value);
+            }
+            if (String.Equals(name, "SteerCenter")) {
+                SteerCenter = int.Parse(value);
+            }
+            if (String.Equals(name, "SteerMax")) {
+                SteerMax = int.Parse(value);
+            }
+            if (String.Equals(name, "ThrustMin")) {
+                ThrustMin = int.Parse(value);
+            }
+            if (String.Equals(name, "ThrustMax")) {
+                ThrustMax = int.Parse(value);
+            }
+            if (String.Equals(name, "BrakeMin")) {
+                BrakeMin = int.Parse(value);
+            }
+            if (String.Equals(name, "BrakeMax")) {
+                BrakeMax = int.Parse(value);
+            }
         }
         catch {
             // 解码配置文件时出错，下一行继续解码。场地可使用 "恢复工厂默认" 功能修正此问题
@@ -39,7 +74,19 @@ public class ReadGameInfo : MonoBehaviour
         List<string> item = new List<string>();
 
         // 高版本 C# 可以用防拼写错误的类型安全写法 nameof(volumn)，unity3d 的 mono 不支持这个语法
-        //item.Add(String.Format("{0} = {1}", "coin_to_start", coin_to_start));
+        item.Add(String.Format("{0} = {1}", "CoinToStart", CoinToStart));
+        item.Add(String.Format("{0} = {1}", "GameMode", GameMode));
+        item.Add(String.Format("{0} = {1}", "InsertCoin", InsertCoin));
+        item.Add(String.Format("{0} = {1}", "GameRecord", GameRecord));
+        item.Add(String.Format("{0} = {1}", "PlayerSpeedMin", PlayerSpeedMin));
+        item.Add(String.Format("{0} = {1}", "AudioVolume", AudioVolume));
+        item.Add(String.Format("{0} = {1}", "SteerMin", SteerMin));
+        item.Add(String.Format("{0} = {1}", "SteerCenter", SteerCenter));
+        item.Add(String.Format("{0} = {1}", "SteerMax", SteerMax));
+        item.Add(String.Format("{0} = {1}", "ThrustMin", ThrustMin));
+        item.Add(String.Format("{0} = {1}", "ThrustMax", ThrustMax));
+        item.Add(String.Format("{0} = {1}", "BrakeMin", BrakeMin));
+        item.Add(String.Format("{0} = {1}", "BrakeMax", BrakeMax));
 
         return item.ToArray();
     }
