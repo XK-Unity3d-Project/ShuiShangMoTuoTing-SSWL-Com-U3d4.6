@@ -31,7 +31,7 @@ public class SetPanel : MonoBehaviour
 	void Start () 
 	{
 		XkGameCtrl.IsLoadingLevel = false;
-		GameAudioVolume = ReadGameInfo.GetInstance().AudioVolume;
+		GameAudioVolume = ReadGameInfo.GetInstance().ReadGameAudioVolume();
 		GameAudioVolumeLB.text = GameAudioVolume.ToString();
 
 		IsOpenSetPanel = true;
@@ -453,15 +453,15 @@ public class SetPanel : MonoBehaviour
 						GameAudioVolume = 0;
 					}
 					GameAudioVolumeLB.text = GameAudioVolume.ToString();
-					ReadGameInfo.GetInstance().AudioVolume = GameAudioVolume;
+					ReadGameInfo.GetInstance().WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
 			case 12:
 				{
 					GameAudioVolume = 7;
 					GameAudioVolumeLB.text = GameAudioVolume.ToString();
-                    ReadGameInfo.GetInstance().AudioVolume = GameAudioVolume;
-                    break;
+					ReadGameInfo.GetInstance().WriteGameAudioVolume(GameAudioVolume);
+					break;
 				}
             case 13:
                 {
