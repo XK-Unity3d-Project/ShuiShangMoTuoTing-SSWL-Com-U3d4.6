@@ -57,31 +57,61 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int START_COIN;
+    private int CoinToStart {
+        get
+        {
+            return Math.Max(1, START_COIN);
+        }
+        set
+        {
+            START_COIN = Math.Max(1, value);
+        }
+    }
+    public string ReadStarCoinNumSet()
+    {
+        return Convert.ToString(START_COIN);
+    }
+    public void WriteStarCoinNumSet(string value)
+    {
+        int tmp_coin_to_start;
+
+        bool ParseSuccess = int.TryParse(value, out tmp_coin_to_start);
+
+        if (ParseSuccess) {
+            START_COIN = tmp_coin_to_start;
+        }
+        else {
+            tmp_coin_to_start = 0;
+        }
+    }
 
     const int MODE_OPERATOR = 0;
     const int MODE_FREEPLAY = 1;
     private int GAME_MODE = MODE_OPERATOR;
-    public int GameMode {
+    private int GameMode {
         get
         {
             return GAME_MODE;
         }
         set
         {
-            if (value == MODE_FREEPLAY) {
-                GAME_MODE = MODE_FREEPLAY;
-            }
-            else {
-                GAME_MODE = MODE_OPERATOR;
-            }
+            GAME_MODE = (value == MODE_FREEPLAY) ? MODE_FREEPLAY : MODE_OPERATOR;
         }
+    }
+    public string ReadGameStarMode()
+    {
+        return (GAME_MODE == MODE_FREEPLAY) ? "FREE" : "oper";
+    }
+    public void WriteGameStarMode(string mode_str)
+    {
+        GAME_MODE = mode_str.Equals("FREE") ? MODE_FREEPLAY : MODE_OPERATOR;
     }
 
     private int INSERT_COIN;
-    public int InserCoin {
+    private int InserCoin {
         get
         {
-            return INSERT_COIN;
+            return Math.Max(INSERT_COIN, 0);
         }
         set
         {
@@ -90,11 +120,11 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int GAME_RECORD;
-    public int GameRecord
+    private int GameRecord
     {
         get
         {
-            return GAME_RECORD;
+            return Math.Max(GAME_RECORD, 0);
         }
         set
         {
@@ -103,7 +133,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int PLAYER_SPEED_MIN;
-    public int PlayerSpeedMin
+    private int PlayerSpeedMin
     {
         get
         {
@@ -114,16 +144,13 @@ public class ReadGameInfo : MonoBehaviour
             PLAYER_SPEED_MIN = Mathf.Clamp(value, 0, 80);
         }
     }
-
-    [Obsolete("ReadPlayerMinSpeedVal() has been deprecated. Use property PlayerSpeedMin instead.")]
     public int ReadPlayerMinSpeedVal()
     {
-        return 0;
+        return PlayerSpeedMin;
     }
-
-    public void WritePlayerMinSpeedVal(int value)
+    public int WritePlayerMinSpeedVal(string value)
     {
-
+        return PlayerSpeedMin;
     }
 
     private int AUDIO_VOLUME;
@@ -235,20 +262,10 @@ public class ReadGameInfo : MonoBehaviour
 		
 	}
 
-	public void FactoryReset()
-	{
+    public void FactoryReset()
+    {
 
-	}
-
-	public string ReadStarCoinNumSet()
-	{
-        return "1";
-	}
-
-    public string ReadGameStarMode()
-	{
-        return "expr";
-	}
+    }
 
     public string ReadInsertCoinNum()
 	{
@@ -260,32 +277,12 @@ public class ReadGameInfo : MonoBehaviour
         return 1;
 	}
 
-    public void WriteStarCoinNumSet(string value)
-	{
-
-    }
-
-    public void WriteGameStarMode(string value)
-	{
-
-	}
-
     public void WriteInsertCoinNum(string value)
 	{
 
 	}
 
     public void WriteGameRecord(int value)
-	{
-
-	}
-
-    public int ReadPlayerMinSpeedVal()
-	{
-        return 0;
-	}
-
-    public void WritePlayerMinSpeedVal(int value)
 	{
 
 	}
