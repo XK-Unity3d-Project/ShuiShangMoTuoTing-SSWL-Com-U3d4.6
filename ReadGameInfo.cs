@@ -67,23 +67,6 @@ public class ReadGameInfo : MonoBehaviour
             START_COIN = Math.Max(1, value);
         }
     }
-    public string ReadStarCoinNumSet()
-    {
-        return Convert.ToString(START_COIN);
-    }
-    public void WriteStarCoinNumSet(string value)
-    {
-        int tmp_coin_to_start;
-
-        bool ParseSuccess = int.TryParse(value, out tmp_coin_to_start);
-
-        if (ParseSuccess) {
-            START_COIN = tmp_coin_to_start;
-        }
-        else {
-            tmp_coin_to_start = 0;
-        }
-    }
 
     const int MODE_OPERATOR = 0;
     const int MODE_FREEPLAY = 1;
@@ -98,17 +81,9 @@ public class ReadGameInfo : MonoBehaviour
             GAME_MODE = (value == MODE_FREEPLAY) ? MODE_FREEPLAY : MODE_OPERATOR;
         }
     }
-    public string ReadGameStarMode()
-    {
-        return (GAME_MODE == MODE_FREEPLAY) ? "FREE" : "oper";
-    }
-    public void WriteGameStarMode(string mode_str)
-    {
-        GAME_MODE = mode_str.Equals("FREE") ? MODE_FREEPLAY : MODE_OPERATOR;
-    }
 
     private int INSERT_COIN;
-    private int InserCoin {
+    private int InsertCoin {
         get
         {
             return Math.Max(INSERT_COIN, 0);
@@ -130,7 +105,7 @@ public class ReadGameInfo : MonoBehaviour
         {
             GAME_RECORD = Math.Max(value, 0);
         }
-    }
+    }    
 
     private int PLAYER_SPEED_MIN;
     private int PlayerSpeedMin
@@ -144,17 +119,9 @@ public class ReadGameInfo : MonoBehaviour
             PLAYER_SPEED_MIN = Mathf.Clamp(value, 0, 80);
         }
     }
-    public int ReadPlayerMinSpeedVal()
-    {
-        return PlayerSpeedMin;
-    }
-    public int WritePlayerMinSpeedVal(string value)
-    {
-        return PlayerSpeedMin;
-    }
 
     private int AUDIO_VOLUME;
-    public int AudioVolume
+    private int AudioVolume
     {
         get
         {
@@ -164,10 +131,10 @@ public class ReadGameInfo : MonoBehaviour
         {
             AUDIO_VOLUME = Mathf.Clamp(value, 0, 10);
         }
-    }
+    }    
 
     private int BIKE_STEER_MIN;     // BikeDirMin;
-    public int BikeSteerMin
+    private int BikeSteerMin
     {
         get
         {
@@ -180,7 +147,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int BIKE_STEER_MIDDLE;  // BikeDirCen;
-    public int BikeSteerMiddle
+    private int BikeSteerMiddle
     {
         get
         {
@@ -193,7 +160,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int BIKE_STEER_MAX;
-    public int BikeSteerMax
+    private int BikeSteerMax
     {
         get
         {
@@ -206,7 +173,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int BIKE_THRUST_MIN;    // BikePowerMin
-    public int BikeThrustMin
+    private int BikeThrustMin
     {
         get
         {
@@ -219,7 +186,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int BIKE_THRUST_MAX;
-    public int BikeThrustMax
+    private int BikeThrustMax
     {
         get
         {
@@ -232,7 +199,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int BIKE_BRAKE_MIN;     // BikeShaCheMin
-    public int BikeBrakeMin
+    private int BikeBrakeMin
     {
         get
         {
@@ -245,7 +212,7 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int BIKE_BRAKE_MAX;
-    public int BikeBrakeMax
+    private int BikeBrakeMax
     {
         get
         {
@@ -267,23 +234,77 @@ public class ReadGameInfo : MonoBehaviour
 
     }
 
+    /* 为了兼容性保留的废弃旧函数 */
+
+    public string ReadStarCoinNumSet()
+    {
+        return Convert.ToString(START_COIN);
+    }
+    public void WriteStarCoinNumSet(string value)
+    {
+        int tmp_coin_to_start;
+
+        bool ParseSuccess = int.TryParse(value, out tmp_coin_to_start);
+
+        if (ParseSuccess) {
+            CoinToStart = tmp_coin_to_start;
+        }
+        else {
+            tmp_coin_to_start = 0;
+        }
+    }
+
+    public string ReadGameStarMode()
+    {
+        return (GAME_MODE == MODE_FREEPLAY) ? "FREE" : "oper";
+    }
+    public void WriteGameStarMode(string mode_str)
+    {
+        GAME_MODE = mode_str.Equals("FREE") ? MODE_FREEPLAY : MODE_OPERATOR;
+    }
+
     public string ReadInsertCoinNum()
-	{
-        return "0";
-	}
+    {
+        return Convert.ToString(InsertCoin);
+    }
+    public void WriteInsertCoinNum(string value)
+    {
+        int tmp_InsertCoin;
+
+        bool ParseSuccess = int.TryParse(value, out tmp_InsertCoin);
+
+        if (!ParseSuccess) {
+            InsertCoin = tmp_InsertCoin;
+        }
+        else {
+            InsertCoin = 0;
+        }
+    }
+
+    public int ReadPlayerMinSpeedVal()
+    {
+        return PlayerSpeedMin;
+    }
+    public void WritePlayerMinSpeedVal(int value)
+    {
+        PlayerSpeedMin = value;
+    }
 
     public int ReadGameRecord()
-	{
-        return 1;
-	}
-
-    public void WriteInsertCoinNum(string value)
-	{
-
-	}
-
+    {
+        return GameRecord;
+    }
     public void WriteGameRecord(int value)
-	{
+    {
+        GameRecord = value;
+    }
 
-	}
+    public void WriteGameAudioVolume(int value)
+    {
+        AudioVolume = value;
+    }
+    public int ReadGameAudioVolume()
+    {
+        return AudioVolume;
+    }
 }
