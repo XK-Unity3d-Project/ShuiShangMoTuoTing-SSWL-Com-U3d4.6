@@ -18,54 +18,88 @@ public class ReadGameInfo : MonoBehaviour
         kconf_.loadFromFile();
     }
 
+    public void Load()
+    {
+        kconf_.loadFromFile();
+    }
+
     public void Save()
     {
         kconf_.saveToFile();
     }
+
+    const int Default_CoinToStart = 1;
+    const int Default_GameMode = MODE_OPERATOR;
+    const int Default_InsertCoin = 0;
+    const int Default_GameRecord = 0;
+    const int Default_PlayerSpeedMin = 0;
+    const int Default_AudioVolume = 7;
+    const int Default_SteerMin = 0;
+    const int Default_SteerMax = STM32_ADC_MAX;
+    const int Default_SteerCenter = (Default_SteerMax + Default_SteerMin) / 2;
+    const int Default_ThrustMin = 0;
+    const int Default_ThrustMax = STM32_ADC_MAX;
+    const int Default_BrakeMin = 0;
+    const int Default_BrakeMax = STM32_ADC_MAX;
 
     // knuconfig 会遍历配置文件的每一行，依次解析出设定项目和值，并传递给此函数
     // 此函数根据情况，将字符串解析成属性的真实类型
     private void ItemToProperty(string name, string value)
     {
         try {
+            int tmp;
+
             if (String.Equals(name, "CoinToStart")) {
-                CoinToStart = int.Parse(value);
+                CoinToStart = int.TryParse(value, out tmp) ? tmp : Default_CoinToStart;
+                return;
             }
             if (String.Equals(name, "GameMode")) {
-                GameMode = int.Parse(value);
+                GameMode = int.TryParse(value, out tmp) ? tmp : Default_GameMode;
+                return;
             }
             if (String.Equals(name, "InsertCoin")) {
-                InsertCoin = int.Parse(value);
+                InsertCoin = int.TryParse(value, out tmp) ? tmp : Default_InsertCoin;
+                return;
             }
             if (String.Equals(name, "GameRecord")) {
-                GameRecord = int.Parse(value);
+                GameRecord = int.TryParse(value, out tmp) ? tmp : Default_GameRecord;
+                return;
             }
             if (String.Equals(name, "PlayerSpeedMin")) {
-                PlayerSpeedMin = int.Parse(value);
+                PlayerSpeedMin = int.TryParse(value, out tmp) ? tmp : Default_PlayerSpeedMin;
+                return;
             }
             if (String.Equals(name, "AudioVolume")) {
-                AudioVolume = int.Parse(value);
+                AudioVolume = int.TryParse(value, out tmp) ? tmp : Default_AudioVolume;
+                return;
             }
             if (String.Equals(name, "SteerMin")) {
-                SteerMin = int.Parse(value);
+                SteerMin = int.TryParse(value, out tmp) ? tmp : Default_SteerMin;
+                return;
             }
             if (String.Equals(name, "SteerCenter")) {
-                SteerCenter = int.Parse(value);
+                SteerCenter = int.TryParse(value, out tmp) ? tmp : Default_SteerCenter;
+                return;
             }
             if (String.Equals(name, "SteerMax")) {
-                SteerMax = int.Parse(value);
+                SteerMax = int.TryParse(value, out tmp) ? tmp : Default_SteerMax;
+                return;
             }
             if (String.Equals(name, "ThrustMin")) {
-                ThrustMin = int.Parse(value);
+                ThrustMin = int.TryParse(value, out tmp) ? tmp : Default_ThrustMin;
+                return;
             }
             if (String.Equals(name, "ThrustMax")) {
-                ThrustMax = int.Parse(value);
+                ThrustMax = int.TryParse(value, out tmp) ? tmp : Default_ThrustMax;
+                return;
             }
             if (String.Equals(name, "BrakeMin")) {
-                BrakeMin = int.Parse(value);
+                BrakeMin = int.TryParse(value, out tmp) ? tmp : Default_BrakeMin;
+                return;
             }
             if (String.Equals(name, "BrakeMax")) {
-                BrakeMax = int.Parse(value);
+                BrakeMax = int.TryParse(value, out tmp) ? tmp : Default_BrakeMax;
+                return;
             }
         }
         catch {
@@ -217,22 +251,37 @@ public class ReadGameInfo : MonoBehaviour
 
     void InitGameInfo()
 	{
-		
+        Load();
 	}
 
     public void FactoryReset()
     {
+        CoinToStart = Default_CoinToStart;
+        GameMode = Default_GameMode;
+        InsertCoin = Default_InsertCoin;
+        GameRecord = Default_GameRecord;
+        PlayerSpeedMin = Default_PlayerSpeedMin;
+        AudioVolume = Default_AudioVolume;
 
+        SteerMin = Default_SteerMin;
+        SteerMax = Default_SteerMax;
+        SteerCenter = Default_SteerCenter;
+
+        ThrustMin = Default_ThrustMin;
+        ThrustMax = Default_ThrustMax;
+
+        BrakeMin = Default_BrakeMin;
+        BrakeMax = Default_BrakeMax;
     }
 
     /* 为了兼容性保留的废弃旧函数 */
 
-    [Obsolete("ReadStarCoinNumSet has been deprecated. Use property CoinToStart instead.")]
+    //[Obsolete("ReadStarCoinNumSet has been deprecated. Use property CoinToStart instead.")]
     public string ReadStarCoinNumSet()
     {
         return Convert.ToString(CoinToStart);
     }
-    [Obsolete("WriteStarCoinNumSet has been deprecated. Use property CoinToStart instead.")]
+    //[Obsolete("WriteStarCoinNumSet has been deprecated. Use property CoinToStart instead.")]
     public void WriteStarCoinNumSet(string value)
     {
         int tmp_coin_to_start;
@@ -247,23 +296,23 @@ public class ReadGameInfo : MonoBehaviour
         }
     }
 
-    [Obsolete("ReadGameStarMode has been deprecated. Use property GameMode instead.")]
+    //[Obsolete("ReadGameStarMode has been deprecated. Use property GameMode instead.")]
     public string ReadGameStarMode()
     {
         return (GameMode == MODE_FREEPLAY) ? "FREE" : "oper";
     }
-    [Obsolete("WriteGameStarMode has been deprecated. Use property GameMode instead.")]
+    //[Obsolete("WriteGameStarMode has been deprecated. Use property GameMode instead.")]
     public void WriteGameStarMode(string mode_str)
     {
         GameMode = mode_str.Equals("FREE") ? MODE_FREEPLAY : MODE_OPERATOR;
     }
 
-    [Obsolete("ReadInsertCoinNum has been deprecated. Use property InsertCoin instead.")]
+    //[Obsolete("ReadInsertCoinNum has been deprecated. Use property InsertCoin instead.")]
     public string ReadInsertCoinNum()
     {
         return Convert.ToString(InsertCoin);
     }
-    [Obsolete("WriteInsertCoinNum has been deprecated. Use property InsertCoin instead.")]
+    //[Obsolete("WriteInsertCoinNum has been deprecated. Use property InsertCoin instead.")]
     public void WriteInsertCoinNum(string value)
     {
         int tmp_InsertCoin;
@@ -278,34 +327,34 @@ public class ReadGameInfo : MonoBehaviour
         }
     }
 
-    [Obsolete("ReadPlayerMinSpeedVal has been deprecated. Use property PlayerSpeedMin instead.")]
+    //[Obsolete("ReadPlayerMinSpeedVal has been deprecated. Use property PlayerSpeedMin instead.")]
     public int ReadPlayerMinSpeedVal()
     {
         return PlayerSpeedMin;
     }
-    [Obsolete("WritePlayerMinSpeedVal has been deprecated. Use property PlayerSpeedMin instead.")]
+    //[Obsolete("WritePlayerMinSpeedVal has been deprecated. Use property PlayerSpeedMin instead.")]
     public void WritePlayerMinSpeedVal(int value)
     {
         PlayerSpeedMin = value;
     }
 
-    [Obsolete("ReadGameRecord has been deprecated. Use property GameRecord instead.")]
+    //[Obsolete("ReadGameRecord has been deprecated. Use property GameRecord instead.")]
     public int ReadGameRecord()
     {
         return GameRecord;
     }
-    [Obsolete("WriteGameRecord has been deprecated. Use property GameRecord instead.")]
+    //[Obsolete("WriteGameRecord has been deprecated. Use property GameRecord instead.")]
     public void WriteGameRecord(int value)
     {
         GameRecord = value;
     }
 
-    [Obsolete("WriteGameAudioVolume has been deprecated. Use property AudioVolume instead.")]
+    //[Obsolete("WriteGameAudioVolume has been deprecated. Use property AudioVolume instead.")]
     public void WriteGameAudioVolume(int value)
     {
         AudioVolume = value;
     }
-    [Obsolete("ReadGameAudioVolume has been deprecated. Use property AudioVolume instead.")]
+    //[Obsolete("ReadGameAudioVolume has been deprecated. Use property AudioVolume instead.")]
     public int ReadGameAudioVolume()
     {
         return AudioVolume;
