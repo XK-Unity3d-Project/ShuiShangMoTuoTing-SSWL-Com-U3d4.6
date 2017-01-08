@@ -61,7 +61,7 @@ public class PlayerControllerForMoiew : MonoBehaviour
 	float HuiEffectSaturation;
 	void Awake()
 	{
-		AudioListener.volume = (float)ReadGameInfo.GetInstance().ReadGameAudioVolume() / 10f;
+		AudioListener.volume = (float)ReadGameInfo.GetInstance().AudioVolume / 10f;
 	}
 
 	void Start()
