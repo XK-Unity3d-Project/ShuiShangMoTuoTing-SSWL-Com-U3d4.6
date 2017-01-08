@@ -170,7 +170,8 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(1.0f);
 
-		GameGradeVal = PlayerPrefs.GetInt("Grade");
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        GameGradeVal = conf.Grade;
 		switch (GameGradeVal)
         {
             case 1: //¼òµ¥

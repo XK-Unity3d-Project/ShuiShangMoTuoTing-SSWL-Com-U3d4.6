@@ -113,21 +113,23 @@ public class pcvr : MonoBehaviour {
 	{
 		InitJiaoYanMiMa();
 
-		//FangXiangInfo
-		SteerValMin = (uint)PlayerPrefs.GetInt("mBikeDirMin");
-		SteerValCen = (uint)PlayerPrefs.GetInt("mBikeDirCen");
-		SteerValMax = (uint)PlayerPrefs.GetInt("mBikeDirMax");
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+
+        //FangXiangInfo
+        SteerValMin = (uint)conf.SteerMin;
+		SteerValCen = (uint)conf.SteerCenter;
+        SteerValMax = (uint)conf.SteerMax;
 		CheckBikeDirLen();
 		
 		//YouMenInfo
-		mBikePowerMin = (uint)PlayerPrefs.GetInt("mBikePowerMin");
-		mBikePowerMax = (uint)PlayerPrefs.GetInt("mBikePowerMax");
-		BikePowerLen = mBikePowerMax < mBikePowerMin ? (mBikePowerMin - mBikePowerMax + 1) : (mBikePowerMax - mBikePowerMin + 1);
+		mBikePowerMin = (uint)conf.ThrustMin;
+        mBikePowerMax = (uint)conf.ThrustMax;
+        BikePowerLen = mBikePowerMax < mBikePowerMin ? (mBikePowerMin - mBikePowerMax + 1) : (mBikePowerMax - mBikePowerMin + 1);
 		BikePowerLen = Math.Max(1, BikePowerLen);
 
-		mBikeShaCheMin = (uint)PlayerPrefs.GetInt("mBikeShaCheMin");
-		mBikeShaCheMax = (uint)PlayerPrefs.GetInt("mBikeShaCheMax");
-		BikeShaCheLen = mBikeShaCheMax < mBikeShaCheMin ? (mBikeShaCheMin - mBikeShaCheMax + 1) : (mBikeShaCheMax - mBikeShaCheMin + 1);
+		mBikeShaCheMin = (uint)conf.BrakeMin;
+		mBikeShaCheMax = (uint)conf.BrakeMax;
+        BikeShaCheLen = mBikeShaCheMax < mBikeShaCheMin ? (mBikeShaCheMin - mBikeShaCheMax + 1) : (mBikeShaCheMax - mBikeShaCheMin + 1);
 		BikeShaCheLen = Math.Max(1, BikeShaCheLen);
 		
 		InitFangXiangPowerOpen();
@@ -1098,8 +1100,9 @@ public class pcvr : MonoBehaviour {
 		}
 		BikePowerLen = Math.Max(1, BikePowerLen);
 
-		PlayerPrefs.SetInt("mBikePowerMax", (int)mBikePowerMax);
-		PlayerPrefs.SetInt("mBikePowerMin", (int)mBikePowerMin);
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        conf.ThrustMax = (int)mBikePowerMax;
+		conf.ThrustMin = (int)mBikePowerMin;
 	}
 
 	public void InitShaCheJiaoZhun()
@@ -1134,8 +1137,9 @@ public class pcvr : MonoBehaviour {
 		}
 		BikeShaCheLen = Math.Max(1, BikeShaCheLen);
 
-		PlayerPrefs.SetInt("mBikeShaCheMax", (int)mBikeShaCheMax);
-		PlayerPrefs.SetInt("mBikeShaCheMin", (int)mBikeShaCheMin);
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        conf.BrakeMax = (int)mBikeShaCheMax;
+		conf.BrakeMin = (int)mBikeShaCheMin;
 	}
 
 	public void InitFangXiangJiaoZhun()
@@ -1176,26 +1180,30 @@ public class pcvr : MonoBehaviour {
 			//ScreenLog.Log("CheTouFangXiangZhengZhuan -> SteerValMin " + SteerValMin + ", SteerValMax " +SteerValMax);
 		}
 		CheckBikeDirLen();
-		PlayerPrefs.SetInt("mBikeDirMin", (int)SteerValMin);
-		PlayerPrefs.SetInt("mBikeDirCen", (int)SteerValCen);
-		PlayerPrefs.SetInt("mBikeDirMax", (int)SteerValMax);
+
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        conf.SteerMin = (int)SteerValMin;
+		conf.SteerCenter = (int)SteerValCen;
+		conf.SteerMax = (int)SteerValMax;
 	}
 
 	void ShaCheJiaoZhun()
 	{
-		if (!IsInitShaCheJiaoZhun) {
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+
+        if (!IsInitShaCheJiaoZhun) {
 			return;
 		}
 		
 		if (BikeShaCheCur < mBikeShaCheMin) {
 			mBikeShaCheMin = BikeShaCheCur;
-			PlayerPrefs.SetInt("mBikeShaCheMin", (int)mBikeShaCheMin);
+			conf.BrakeMin = (int)mBikeShaCheMin;
 		}
 		
 		if (BikeShaCheCur > mBikeShaCheMax) {
 			mBikeShaCheMax = BikeShaCheCur;
-			PlayerPrefs.SetInt("mBikeShaCheMax", (int)mBikeShaCheMax);
-		}
+            conf.BrakeMax = (int)mBikeShaCheMax;
+        }
 		
 		if (bPlayerStartKeyDown && !IsJiaoZhunFireBt) {
 			IsJiaoZhunFireBt = true;
@@ -1216,19 +1224,22 @@ public class pcvr : MonoBehaviour {
 
 	void YouMenJiaoZhun()
 	{
-		if (!IsInitYouMenJiaoZhun) {
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+
+        if (!IsInitYouMenJiaoZhun) {
 			return;
 		}
 
 		if (BikePowerCur < mBikePowerMin) {
 			mBikePowerMin = BikePowerCur;
-			PlayerPrefs.SetInt("mBikePowerMin", (int)mBikePowerMin);
-		}
+            conf.ThrustMin = (int)mBikePowerMin;
+
+        }
 		
 		if (BikePowerCur > mBikePowerMax) {
 			mBikePowerMax = BikePowerCur;
-			PlayerPrefs.SetInt("mBikePowerMax", (int)mBikePowerMax);
-		}
+            conf.ThrustMax = (int)mBikePowerMax;
+        }
 		
 		if (bPlayerStartKeyDown && !IsJiaoZhunFireBt) {
 			IsJiaoZhunFireBt = true;
@@ -1256,16 +1267,17 @@ public class pcvr : MonoBehaviour {
 		if (!IsInitFangXiangJiaoZhun) {
 			return;
 		}
-		
-		//Record FangXiangInfo
-		if (SteerValCur < SteerValMin) {
+
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        //Record FangXiangInfo
+        if (SteerValCur < SteerValMin) {
 			SteerValMin = SteerValCur;
-			PlayerPrefs.SetInt("mBikeDirMin", (int)SteerValMin);
+			conf.SteerMin = (int)SteerValMin;
 		}
 		
 		if (SteerValCur > SteerValMax) {
 			SteerValMax = SteerValCur;
-			PlayerPrefs.SetInt("mBikeDirMax", (int)SteerValMax);
+            conf.SteerMax = (int)SteerValMax;
 		}
 		
 		if (bPlayerStartKeyDown && !IsJiaoZhunFireBt) {

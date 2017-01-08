@@ -30,8 +30,10 @@ public class SetPanel : MonoBehaviour
 	int GameAudioVolume;
 	void Start () 
 	{
-		XkGameCtrl.IsLoadingLevel = false;
-		GameAudioVolume = ReadGameInfo.GetInstance().ReadGameAudioVolume();
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+
+        XkGameCtrl.IsLoadingLevel = false;
+		GameAudioVolume = conf.ReadGameAudioVolume();
 		GameAudioVolumeLB.text = GameAudioVolume.ToString();
 
 		IsOpenSetPanel = true;
@@ -39,18 +41,18 @@ public class SetPanel : MonoBehaviour
 		pcvr.ShaCheBtLight = StartLightState.Mie;
 		pcvr.CloseFangXiangPanPower();
 		pcvr.IsSlowLoopCom = false;
-		m_InserNum = Convert.ToInt32(ReadGameInfo.GetInstance().ReadInsertCoinNum());
+		m_InserNum = Convert.ToInt32(conf.ReadInsertCoinNum());
 		UpdateInsertCoin();
 
 		BtInfoLabel.text = "";
 		m_ZhujiemianXingXing.localPosition = new Vector3(-510.0f,212.0f,0.0f);
-		string GameMode = ReadGameInfo.GetInstance().ReadGameStarMode();
+		string GameMode = conf.ReadGameStarMode();
 		if (GameMode == "" || GameMode == null) {
 			GameMode = "oper";
 		}
 
-		m_CoinForStar.text = ReadGameInfo.GetInstance().ReadStarCoinNumSet();
-		int minSpeedPlayer = (int)ReadGameInfo.GetInstance().ReadPlayerMinSpeedVal();
+		m_CoinForStar.text = conf.ReadStarCoinNumSet();
+		int minSpeedPlayer = (int)conf.ReadPlayerMinSpeedVal();
 		PlayerMinSpeed.text = minSpeedPlayer.ToString();
 		if(GameMode == "oper")
 		{
@@ -75,29 +77,27 @@ public class SetPanel : MonoBehaviour
 		InputEventCtrl.GetInstance().ClickLaBaBtEvent += ClickLaBaBtEvent;
 		InputEventCtrl.GetInstance().ClickCloseDongGanBtEvent += ClickCloseDongGanBtEvent;
 
-        if (PlayerPrefs.GetInt("Grade") == 0)
+        if (conf.Grade == 0)
         {
-            PlayerPrefs.SetInt("Grade", 2);
+            conf.Grade = 2;
         }
 
-        switch (PlayerPrefs.GetInt("Grade"))
-        {
+        switch (conf.Grade) {
             case 1:
-				GameGradeDuiGou[0].enabled = true;
-				GameGradeDuiGou[1].enabled = false;
-				GameGradeDuiGou[2].enabled = false;
+                GameGradeDuiGou[0].enabled = true;
+                GameGradeDuiGou[1].enabled = false;
+                GameGradeDuiGou[2].enabled = false;
                 break;
-			case 2:
-				GameGradeDuiGou[0].enabled = false;
-				GameGradeDuiGou[1].enabled = true;
-				GameGradeDuiGou[2].enabled = false;
+            case 3:
+                GameGradeDuiGou[0].enabled = false;
+                GameGradeDuiGou[1].enabled = false;
+                GameGradeDuiGou[2].enabled = true;
                 break;
-			case 3:
-				GameGradeDuiGou[0].enabled = false;
-				GameGradeDuiGou[1].enabled = false;
-				GameGradeDuiGou[2].enabled = true;
-                break;
-            default:
+            case 2:
+            default: // 默认设置为普通难度
+                GameGradeDuiGou[0].enabled = false;
+                GameGradeDuiGou[1].enabled = true;
+                GameGradeDuiGou[2].enabled = false;
                 break;
         }
     }
@@ -366,6 +366,8 @@ public class SetPanel : MonoBehaviour
 
     void OnClickSelectBtInZhujiemian()
     {
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+
         switch (m_IndexZhujiemian)
         {
             case 0:
@@ -377,21 +379,21 @@ public class SetPanel : MonoBehaviour
                         CoinNum = 1;
                     }
                     m_CoinForStar.text = CoinNum.ToString();
-                    ReadGameInfo.GetInstance().WriteStarCoinNumSet(CoinNum.ToString());
+                    conf.WriteStarCoinNumSet(CoinNum.ToString());
                     break;
                 }
             case 1:
                 {
                     m_GameModeDuigou1.enabled = true;
                     m_GameModeDuigou2.enabled = false;
-                    ReadGameInfo.GetInstance().WriteGameStarMode("oper");
+                    conf.WriteGameStarMode("oper");
                     break;
                 }
             case 2:
                 {
                     m_GameModeDuigou1.enabled = false;
                     m_GameModeDuigou2.enabled = true;
-                    ReadGameInfo.GetInstance().WriteGameStarMode("FREE");
+                    conf.WriteGameStarMode("FREE");
                     break;
                 }
             case 3:
@@ -453,14 +455,14 @@ public class SetPanel : MonoBehaviour
 						GameAudioVolume = 0;
 					}
 					GameAudioVolumeLB.text = GameAudioVolume.ToString();
-					ReadGameInfo.GetInstance().WriteGameAudioVolume(GameAudioVolume);
+					conf.WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
 			case 12:
 				{
 					GameAudioVolume = 7;
 					GameAudioVolumeLB.text = GameAudioVolume.ToString();
-					ReadGameInfo.GetInstance().WriteGameAudioVolume(GameAudioVolume);
+					conf.WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
             case 13:
@@ -472,7 +474,7 @@ public class SetPanel : MonoBehaviour
                         speedVal = 0;
                     }
                     PlayerMinSpeed.text = speedVal.ToString();
-                    ReadGameInfo.GetInstance().WritePlayerMinSpeedVal(speedVal);
+                    conf.WritePlayerMinSpeedVal(speedVal);
                     break;
                 }
             case 14:
@@ -486,7 +488,7 @@ public class SetPanel : MonoBehaviour
 					GameGradeDuiGou[0].enabled = true;
 					GameGradeDuiGou[1].enabled = false;
 					GameGradeDuiGou[2].enabled = false;
-                    PlayerPrefs.SetInt("Grade", 1);
+                    conf.Grade = 1;
                     break;
                 }
 
@@ -495,7 +497,7 @@ public class SetPanel : MonoBehaviour
 					GameGradeDuiGou[0].enabled = false;
 					GameGradeDuiGou[1].enabled = true;
 					GameGradeDuiGou[2].enabled = false;
-                    PlayerPrefs.SetInt("Grade", 2);
+                    conf.Grade = 2;
                     break;
                 }
 
@@ -504,12 +506,13 @@ public class SetPanel : MonoBehaviour
 					GameGradeDuiGou[0].enabled = false;
 					GameGradeDuiGou[1].enabled = false;
 					GameGradeDuiGou[2].enabled = true;
-                    PlayerPrefs.SetInt("Grade", 3);
+                    conf.Grade = 3;
                     break;
                 }
 
             case 18:
                 {
+                    conf.Save();
                     CloseAllQiNang();
 					pcvr.StartBtLight = StartLightState.Mie;
 					XkGameCtrl.IsLoadingLevel = true;
