@@ -1,172 +1,291 @@
 ﻿#define USE_HANDLE_JSON
+
 using UnityEngine;
-using System.Collections;
 using System;
-using System.IO;
+using System.Collections.Generic;
 
-public class ReadGameInfo : MonoBehaviour 
+using Knu;
+
+public class ReadGameInfo : MonoBehaviour
 {
-	static private ReadGameInfo Instance = null;
-	private HandleJson handleJsonObj;
-	private string m_pStarCoinNum = "";
-	private string m_pGameMode = "";
-	private string m_pInsertCoinNum = "0";
+    const int STM32_ADC_MAX = 4096;
 
-	private int GameRecordVal;
-	private int PlayerMinSpeedVal = 0;
-	/**
-	 * 游戏音量(0-10).
-	 */
-	int GameAudioVolume;
-	#if USE_HANDLE_JSON
-	static HandleJson PHandleJson;
-	static string FilePath = Application.dataPath+"/../config";
-	static string FileName = "../config/XKGameConfig.xml";
-	#endif
-	static public ReadGameInfo GetInstance()
+    private knuconfig kconf_;
+
+    private void Awake()
+    {
+        kconf_ = new knuconfig(@"mtt.conf", ItemToProperty, PropertyToItem);
+        kconf_.loadFromFile();
+    }
+
+    // knuconfig 会遍历配置文件的每一行，依次解析出设定项目和值，并传递给此函数
+    // 此函数根据情况，将字符串解析成属性的真实类型
+    private void ItemToProperty(string name, string value)
+    {
+        try {
+            /*if (String.Equals(name, "coin_to_start")) {
+                coin_to_start = int.Parse(value);
+            }
+            */
+        }
+        catch {
+            // 解码配置文件时出错，下一行继续解码。场地可使用 "恢复工厂默认" 功能修正此问题
+        }
+    }
+
+    // 把属性的值，保存到字符串数组，准备写入配置文件
+    private string[] PropertyToItem()
+    {
+        List<string> item = new List<string>();
+
+        // 高版本 C# 可以用防拼写错误的类型安全写法 nameof(volumn)，unity3d 的 mono 不支持这个语法
+        //item.Add(String.Format("{0} = {1}", "coin_to_start", coin_to_start));
+
+        return item.ToArray();
+    }
+
+    private static ReadGameInfo Instance = null;
+    static public ReadGameInfo GetInstance()
+    {
+        if (Instance == null) {
+            GameObject obj = new GameObject("_ReadGameInfo");
+            DontDestroyOnLoad(obj);
+            Instance = obj.AddComponent<ReadGameInfo>();
+        }
+
+        return Instance;
+    }
+
+    private int START_COIN;
+
+    const int MODE_OPERATOR = 0;
+    const int MODE_FREEPLAY = 1;
+    private int GAME_MODE = MODE_OPERATOR;
+    public int GameMode {
+        get
+        {
+            return GAME_MODE;
+        }
+        set
+        {
+            if (value == MODE_FREEPLAY) {
+                GAME_MODE = MODE_FREEPLAY;
+            }
+            else {
+                GAME_MODE = MODE_OPERATOR;
+            }
+        }
+    }
+
+    private int INSERT_COIN;
+    public int InserCoin {
+        get
+        {
+            return INSERT_COIN;
+        }
+        set
+        {
+            INSERT_COIN = Math.Max(value, 0);
+        }
+    }
+
+    private int GAME_RECORD;
+    public int GameRecord
+    {
+        get
+        {
+            return GAME_RECORD;
+        }
+        set
+        {
+            GAME_RECORD = Math.Max(value, 0);
+        }
+    }
+
+    private int PLAYER_SPEED_MIN;
+    public int PlayerSpeedMin
+    {
+        get
+        {
+            return PLAYER_SPEED_MIN;
+        }
+        set
+        {
+            PLAYER_SPEED_MIN = Mathf.Clamp(value, 0, 80);
+        }
+    }
+
+    private int AUDIO_VOLUMN;
+    public int AudioVolumn
+    {
+        get
+        {
+            return AUDIO_VOLUMN;
+        }
+        set
+        {
+            AUDIO_VOLUMN = Mathf.Clamp(value, 0, 10);
+        }
+    }
+
+    private int BIKE_STEER_MIN;     // BikeDirMin;
+    public int BikeSteerMin
+    {
+        get
+        {
+            return BIKE_STEER_MIN;
+        }
+        set
+        {
+            BIKE_STEER_MIN = Mathf.Clamp(value, 0, BIKE_STEER_MIDDLE);
+        }
+    }
+
+    private int BIKE_STEER_MIDDLE;  // BikeDirCen;
+    public int BikeSteerMiddle
+    {
+        get
+        {
+            return BIKE_STEER_MIDDLE;
+        }
+        set
+        {
+            BIKE_STEER_MIDDLE = Mathf.Clamp(value, BIKE_STEER_MIN, BIKE_STEER_MAX);
+        }
+    }
+
+    private int BIKE_STEER_MAX;
+    public int BikeSteerMax
+    {
+        get
+        {
+            return BIKE_STEER_MAX;
+        }
+        set
+        {
+            BIKE_STEER_MAX = Mathf.Clamp(value, BIKE_STEER_MIDDLE, STM32_ADC_MAX);
+        }
+    }
+
+    private int BIKE_THRUST_MIN;    // BikePowerMin
+    public int BikeThrustMin
+    {
+        get
+        {
+            return BIKE_THRUST_MIN;
+        }
+        set
+        {
+            BIKE_THRUST_MIN = Mathf.Clamp(value, 0, BIKE_THRUST_MAX);
+        }
+    }
+
+    private int BIKE_THRUST_MAX;
+    public int BikeThrustMax
+    {
+        get
+        {
+            return BIKE_THRUST_MAX;
+        }
+        set
+        {
+            BIKE_THRUST_MAX = Mathf.Clamp(value, BIKE_THRUST_MIN, STM32_ADC_MAX);
+        }
+    }
+
+    private int BIKE_BRAKE_MIN;     // BikeShaCheMin
+    public int BikeBrakeMin
+    {
+        get
+        {
+            return BIKE_BRAKE_MIN;
+        }
+        set
+        {
+            BIKE_BRAKE_MIN = Mathf.Clamp(value, 0, BIKE_THRUST_MAX);
+        }
+    }
+
+    private int BIKE_BRAKE_MAX;
+    public int BikeBrakeMax
+    {
+        get
+        {
+            return BIKE_BRAKE_MAX;
+        }
+        set
+        {
+            BIKE_BRAKE_MAX = Mathf.Clamp(value, BIKE_BRAKE_MIN, STM32_ADC_MAX);
+        }
+    }
+
+    void InitGameInfo()
 	{
-		if (Instance == null) {
-			#if USE_HANDLE_JSON
-			PHandleJson = HandleJson.GetInstance();
-			if (!Directory.Exists(FilePath)) {
-				//如果不存在就创建file文件夹.
-				Directory.CreateDirectory(FilePath);
-			}
-			#endif
-			GameObject obj = new GameObject("_ReadGameInfo");
-			DontDestroyOnLoad(obj);
-			Instance = obj.AddComponent<ReadGameInfo>();
-			Instance.InitGameInfo();
-		}
-		return Instance;
-	}
-	void InitGameInfo()
-	{
-		m_pInsertCoinNum = "0";
 		
-		int gameModeSt = PlayerPrefs.GetInt("GAME_MODE");
-		if (gameModeSt != 0 && gameModeSt != 1) {
-			gameModeSt = 1; //0->运营模式, 1->免费模式.
-			PlayerPrefs.SetInt("GAME_MODE", gameModeSt);
-		}
-		m_pGameMode = gameModeSt == 0 ? "oper" : "FREE";
-
-		int coinStart = PlayerPrefs.GetInt("START_COIN");
-		if (coinStart == 0) {
-			coinStart = 1;
-			PlayerPrefs.SetInt("START_COIN", coinStart);
-		}
-		m_pStarCoinNum = coinStart.ToString();
-
-		GameRecordVal = PlayerPrefs.GetInt("GAME_RECORD");
-		
-		int value = PlayerPrefs.GetInt("PlayerMinSpeedVal");
-		if (value < 0) {
-			value = 0;
-		}
-		PlayerMinSpeedVal = value;
-
-		#if USE_HANDLE_JSON
-		string readInfo = PHandleJson.ReadFromFileXml(FileName, "GameAudioVolume");
-		if (readInfo == null || readInfo == "") {
-			readInfo = "7";
-			PHandleJson.WriteToFileXml(FileName, "GameAudioVolume", readInfo);
-		}
-
-		value = Convert.ToInt32(readInfo);
-		if (value < 0 || value > 10) {
-			value = 7;
-			PHandleJson.WriteToFileXml(FileName, "GameAudioVolume", value.ToString());
-		}
-		#else
-		if (!PlayerPrefs.HasKey("GameAudioVolume")) {
-			PlayerPrefs.SetInt("GameAudioVolume", 7);
-			PlayerPrefs.Save();
-		}
-
-		value = PlayerPrefs.GetInt("GameAudioVolume");
-		if (value < 0 || value > 10) {
-			value = 7;
-			PlayerPrefs.SetInt("GameAudioVolume", value);
-			PlayerPrefs.Save();
-		}
-		#endif
-		GameAudioVolume = value;
 	}
+
 	public void FactoryReset()
 	{
-		WriteStarCoinNumSet("1");
-		WriteGameStarMode("oper");
-		WriteInsertCoinNum("0");
-		WriteGameRecord(180);
-		WritePlayerMinSpeedVal(0);
-		WriteGameAudioVolume(7);
+
 	}
+
 	public int ReadGameAudioVolume()
 	{
-		return GameAudioVolume;
+        return 7;
 	}
+
 	public void WriteGameAudioVolume(int value)
 	{
-		#if USE_HANDLE_JSON
-		PHandleJson.WriteToFileXml(FileName, "GameAudioVolume", value.ToString());
-		#else
-		PlayerPrefs.SetInt("GameAudioVolume", value);
-		PlayerPrefs.Save();
-		#endif
-		GameAudioVolume = value;
-		AudioListener.volume = (float)value / 10f;
-	}
+
+    }
+
 	public string ReadStarCoinNumSet()
 	{
-		return m_pStarCoinNum;
+        return "1";
 	}
-	public string ReadGameStarMode()
+
+    public string ReadGameStarMode()
 	{
-		return m_pGameMode;
+        return "expr";
 	}
-	public string ReadInsertCoinNum()
+
+    public string ReadInsertCoinNum()
 	{
-		return m_pInsertCoinNum;
+        return "0";
 	}
-	public int ReadGameRecord()
+
+    public int ReadGameRecord()
 	{
-		return GameRecordVal;
+        return 1;
 	}
-	public void WriteStarCoinNumSet(string value)
+
+    public void WriteStarCoinNumSet(string value)
 	{
-		int coinStart = Convert.ToInt32(value);
-		PlayerPrefs.SetInt("START_COIN", coinStart);
-		m_pStarCoinNum = coinStart.ToString();
-	}
-	public void WriteGameStarMode(string value)
+
+    }
+
+    public void WriteGameStarMode(string value)
 	{
-		int gameModeSt = value == "oper" ? 0 : 1;
-		PlayerPrefs.SetInt("GAME_MODE", gameModeSt);
-		m_pGameMode = value;
+
 	}
-	public void WriteInsertCoinNum(string value)
+
+    public void WriteInsertCoinNum(string value)
 	{
-		m_pInsertCoinNum = value;
+
 	}
-	public void WriteGameRecord(int value)
+
+    public void WriteGameRecord(int value)
 	{
-		PlayerPrefs.SetInt("GAME_RECORD", value);
-		GameRecordVal = value;
+
 	}
-	public int ReadPlayerMinSpeedVal()
+
+    public int ReadPlayerMinSpeedVal()
 	{
-		return PlayerMinSpeedVal;
+        return 0;
 	}
-	public void WritePlayerMinSpeedVal(int value)
+
+    public void WritePlayerMinSpeedVal(int value)
 	{
-		PlayerPrefs.SetInt("PlayerMinSpeedVal", value);
-		PlayerMinSpeedVal = value;
+
 	}
-//	void OnGUI()
-//	{
-//		string strA = "StarCoinNum "+m_pStarCoinNum
-//						+", GameMode "+m_pGameMode;
-//		GUI.Box(new Rect(0f, 0f, Screen.width, 30f), strA);
-//	}
 }
