@@ -196,6 +196,20 @@ public class ReadGameInfo : MonoBehaviour
         set { BRAKE_MAX = Mathf.Clamp(value, BRAKE_MIN, STM32_ADC_MAX); }
     }
 
+    enum GRADE_LEVEL { EASY = 1, NORMAL = 2, DIFFICULT = 3 };
+    private GRADE_LEVEL GRADE;
+    public int Grade
+    {
+        get { return (int)GRADE; }
+        set {
+            switch (value) {
+                case 1: GRADE = GRADE_LEVEL.EASY; break;
+                case 3: GRADE = GRADE_LEVEL.DIFFICULT; break;
+                default: GRADE = GRADE_LEVEL.NORMAL; break;
+            }
+        }
+    }
+
     void InitGameInfo()
 	{
 		
