@@ -115,16 +115,27 @@ public class ReadGameInfo : MonoBehaviour
         }
     }
 
-    private int AUDIO_VOLUMN;
-    public int AudioVolumn
+    [Obsolete("ReadPlayerMinSpeedVal() has been deprecated. Use property PlayerSpeedMin instead.")]
+    public int ReadPlayerMinSpeedVal()
+    {
+        return 0;
+    }
+
+    public void WritePlayerMinSpeedVal(int value)
+    {
+
+    }
+
+    private int AUDIO_VOLUME;
+    public int AudioVolume
     {
         get
         {
-            return AUDIO_VOLUMN;
+            return AUDIO_VOLUME;
         }
         set
         {
-            AUDIO_VOLUMN = Mathf.Clamp(value, 0, 10);
+            AUDIO_VOLUME = Mathf.Clamp(value, 0, 10);
         }
     }
 
@@ -228,16 +239,6 @@ public class ReadGameInfo : MonoBehaviour
 	{
 
 	}
-
-	public int ReadGameAudioVolume()
-	{
-        return 7;
-	}
-
-	public void WriteGameAudioVolume(int value)
-	{
-
-    }
 
 	public string ReadStarCoinNumSet()
 	{
