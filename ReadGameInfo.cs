@@ -57,171 +57,96 @@ public class ReadGameInfo : MonoBehaviour
     }
 
     private int START_COIN;
-    private int CoinToStart {
-        get
-        {
-            return Math.Max(1, START_COIN);
-        }
-        set
-        {
-            START_COIN = Math.Max(1, value);
-        }
+    private int CoinToStart
+    {
+        get { return Math.Max(1, START_COIN); }
+        set { START_COIN = Math.Max(value, 1); }
     }
 
     const int MODE_OPERATOR = 0;
     const int MODE_FREEPLAY = 1;
     private int GAME_MODE = MODE_OPERATOR;
-    private int GameMode {
-        get
-        {
-            return GAME_MODE;
-        }
-        set
-        {
-            GAME_MODE = (value == MODE_FREEPLAY) ? MODE_FREEPLAY : MODE_OPERATOR;
-        }
+    private int GameMode
+    {
+        get { return GAME_MODE; }
+        set { GAME_MODE = (value == MODE_FREEPLAY) ? MODE_FREEPLAY : MODE_OPERATOR; }
     }
 
     private int INSERT_COIN;
-    private int InsertCoin {
-        get
-        {
-            return Math.Max(INSERT_COIN, 0);
-        }
-        set
-        {
-            INSERT_COIN = Math.Max(value, 0);
-        }
+    private int InsertCoin
+    {
+        get { return Math.Max(INSERT_COIN, 0); }
+        set { INSERT_COIN = Math.Max(value, 0); }
     }
 
     private int GAME_RECORD;
     private int GameRecord
     {
-        get
-        {
-            return Math.Max(GAME_RECORD, 0);
-        }
-        set
-        {
-            GAME_RECORD = Math.Max(value, 0);
-        }
+        get { return Math.Max(GAME_RECORD, 0); }
+        set { GAME_RECORD = Math.Max(value, 0); }
     }    
 
     private int PLAYER_SPEED_MIN;
     private int PlayerSpeedMin
     {
-        get
-        {
-            return PLAYER_SPEED_MIN;
-        }
-        set
-        {
-            PLAYER_SPEED_MIN = Mathf.Clamp(value, 0, 80);
-        }
+        get { return PLAYER_SPEED_MIN; }
+        set { PLAYER_SPEED_MIN = Mathf.Clamp(value, 0, 80); }
     }
 
     private int AUDIO_VOLUME;
     private int AudioVolume
     {
-        get
-        {
-            return AUDIO_VOLUME;
-        }
-        set
-        {
-            AUDIO_VOLUME = Mathf.Clamp(value, 0, 10);
-        }
+        get { return Mathf.Clamp(AUDIO_VOLUME, 0, 10); }
+        set { AUDIO_VOLUME = Mathf.Clamp(value, 0, 10); }
     }    
 
-    private int BIKE_STEER_MIN;     // BikeDirMin;
-    private int BikeSteerMin
+    private int STEER_MIN;     // BikeDirMin;
+    public int SteerMin
     {
-        get
-        {
-            return BIKE_STEER_MIN;
-        }
-        set
-        {
-            BIKE_STEER_MIN = Mathf.Clamp(value, 0, BIKE_STEER_MIDDLE);
-        }
+        get { return Mathf.Clamp(STEER_MIN, 0, STEER_CENTER); }
+        set { STEER_MIN = Mathf.Clamp(value, 0, STEER_CENTER); }
     }
 
-    private int BIKE_STEER_MIDDLE;  // BikeDirCen;
-    private int BikeSteerMiddle
+    private int STEER_CENTER;  // BikeDirCen;
+    public int SteerCenter
     {
-        get
-        {
-            return BIKE_STEER_MIDDLE;
-        }
-        set
-        {
-            BIKE_STEER_MIDDLE = Mathf.Clamp(value, BIKE_STEER_MIN, BIKE_STEER_MAX);
-        }
+        get { return STEER_CENTER; }
+        set { STEER_CENTER = Mathf.Clamp(value, STEER_MIN, STEER_MAX); }
     }
 
-    private int BIKE_STEER_MAX;
-    private int BikeSteerMax
+    private int STEER_MAX;
+    public int SteerMax
     {
-        get
-        {
-            return BIKE_STEER_MAX;
-        }
-        set
-        {
-            BIKE_STEER_MAX = Mathf.Clamp(value, BIKE_STEER_MIDDLE, STM32_ADC_MAX);
-        }
+        get { return STEER_MAX; }
+        set { STEER_MAX = Mathf.Clamp(value, STEER_CENTER, STM32_ADC_MAX); }
     }
 
-    private int BIKE_THRUST_MIN;    // BikePowerMin
-    private int BikeThrustMin
+    private int THRUST_MIN;    // BikePowerMin
+    public int ThrustMin
     {
-        get
-        {
-            return BIKE_THRUST_MIN;
-        }
-        set
-        {
-            BIKE_THRUST_MIN = Mathf.Clamp(value, 0, BIKE_THRUST_MAX);
-        }
+        get { return THRUST_MIN; }
+        set { THRUST_MIN = Mathf.Clamp(value, 0, THRUST_MAX); }
     }
 
-    private int BIKE_THRUST_MAX;
-    private int BikeThrustMax
+    private int THRUST_MAX;
+    public int ThrustMax
     {
-        get
-        {
-            return BIKE_THRUST_MAX;
-        }
-        set
-        {
-            BIKE_THRUST_MAX = Mathf.Clamp(value, BIKE_THRUST_MIN, STM32_ADC_MAX);
-        }
+        get { return THRUST_MAX; }
+        set { THRUST_MAX = Mathf.Clamp(value, THRUST_MIN, STM32_ADC_MAX); }
     }
 
-    private int BIKE_BRAKE_MIN;     // BikeShaCheMin
-    private int BikeBrakeMin
+    private int BRAKE_MIN;     // BikeShaCheMin
+    public int BrakeMin
     {
-        get
-        {
-            return BIKE_BRAKE_MIN;
-        }
-        set
-        {
-            BIKE_BRAKE_MIN = Mathf.Clamp(value, 0, BIKE_THRUST_MAX);
-        }
+        get { return BRAKE_MIN; }
+        set { BRAKE_MIN = Mathf.Clamp(value, 0, THRUST_MAX); }
     }
 
-    private int BIKE_BRAKE_MAX;
-    private int BikeBrakeMax
+    private int BRAKE_MAX;
+    public int BrakeMax
     {
-        get
-        {
-            return BIKE_BRAKE_MAX;
-        }
-        set
-        {
-            BIKE_BRAKE_MAX = Mathf.Clamp(value, BIKE_BRAKE_MIN, STM32_ADC_MAX);
-        }
+        get { return BRAKE_MAX; }
+        set { BRAKE_MAX = Mathf.Clamp(value, BRAKE_MIN, STM32_ADC_MAX); }
     }
 
     void InitGameInfo()
