@@ -18,6 +18,11 @@ public class ReadGameInfo : MonoBehaviour
         kconf_.loadFromFile();
     }
 
+    public void Save()
+    {
+        kconf_.saveToFile();
+    }
+
     // knuconfig 会遍历配置文件的每一行，依次解析出设定项目和值，并传递给此函数
     // 此函数根据情况，将字符串解析成属性的真实类型
     private void ItemToProperty(string name, string value)
