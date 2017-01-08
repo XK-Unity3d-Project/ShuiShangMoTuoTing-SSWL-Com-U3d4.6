@@ -1385,13 +1385,13 @@ public class pcvr : MonoBehaviour {
         //Debug.Log("KeyProcess() -> buffer[9] : " + buffer[9] + ", IsCloseDongGanBtDown : " + IsCloseDongGanBtDown);
         if ( !IsCloseDongGanBtDown && 0x02 == (buffer[9]&0x02) ) {
             // ScreenLog.Log("game DongGanBt down!");
-            Debug.Log("game DongGanBt down!");
+            //Debug.Log("game DongGanBt down!");
             IsCloseDongGanBtDown = true;
 			InputEventCtrl.GetInstance().ClickCloseDongGanBt( ButtonState.DOWN );
 		}
 		else if ( IsCloseDongGanBtDown && 0x00 == (buffer[9]&0x02) ) {
             // ScreenLog.Log("game DongGanBt up!");
-            Debug.Log("game DongGanBt up!");
+            //Debug.Log("game DongGanBt up!");
             IsCloseDongGanBtDown = false;
 			InputEventCtrl.GetInstance().ClickCloseDongGanBt( ButtonState.UP );
 		}
@@ -1400,14 +1400,14 @@ public class pcvr : MonoBehaviour {
         //if ( !bPlayerStartKeyDown && 0x01 == (buffer[28]&0x01) ) { //test
         if ( !bPlayerStartKeyDown && 0x01 == (buffer[9]&0x01) ) {
             //ScreenLog.Log("game startBt down!");
-            Debug.Log("game startBt down!");
+            //Debug.Log("game startBt down!");
             bPlayerStartKeyDown = true;
 			InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.DOWN );
 		}
 		//else if ( bPlayerStartKeyDown && 0x00 == (buffer[28]&0x01) ) { //test
 		else if ( bPlayerStartKeyDown && 0x00 == (buffer[9]&0x01) ) {
             //ScreenLog.Log("game startBt up!");
-            Debug.Log("game startBt up!");
+            //Debug.Log("game startBt up!");
             bPlayerStartKeyDown = false;
 			InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.UP );
 		}
@@ -1416,13 +1416,13 @@ public class pcvr : MonoBehaviour {
         if ( !bSetEnterKeyDown && 0x10 == (buffer[9]&0x10) ) {
 			bSetEnterKeyDown = true;
             //ScreenLog.Log("game setEnterBt down!");
-            Debug.Log("game setEnterBt down!");
+            //Debug.Log("game setEnterBt down!");
             InputEventCtrl.GetInstance().ClickSetEnterBt( ButtonState.DOWN );
 		}
 		else if ( bSetEnterKeyDown && 0x00 == (buffer[9]&0x10) ) {
 			bSetEnterKeyDown = false;
 			//ScreenLog.Log("game setEnterBt up!");
-            Debug.Log("game setEnterBt up!");
+            //Debug.Log("game setEnterBt up!");
             InputEventCtrl.GetInstance().ClickSetEnterBt( ButtonState.UP );
 		}
 
@@ -1430,13 +1430,13 @@ public class pcvr : MonoBehaviour {
         if ( !bSetMoveKeyDown && 0x20 == (buffer[9]&0x20) ) {
 			bSetMoveKeyDown = true;
             // ScreenLog.Log("game setMoveBt down!");
-            Debug.Log("game setMoveBt down!");
+            //Debug.Log("game setMoveBt down!");
             InputEventCtrl.GetInstance().ClickSetMoveBt( ButtonState.DOWN );
 		}
 		else if( bSetMoveKeyDown && 0x00 == (buffer[9]&0x20) ) {
 			bSetMoveKeyDown = false;
             // ScreenLog.Log("game setMoveBt up!");
-            Debug.Log("game setMoveBt up!");
+            //Debug.Log("game setMoveBt up!");
             InputEventCtrl.GetInstance().ClickSetMoveBt( ButtonState.UP );
 		}
 
@@ -1445,13 +1445,13 @@ public class pcvr : MonoBehaviour {
         if ( !IsClickLaBaBt && 0x04 == (buffer[9]&0x04) ) {
 			IsClickLaBaBt = true;
             //			ScreenLog.Log("game LaBaBt down!");
-            Debug.Log("game LaBaBt down!");
+            //Debug.Log("game LaBaBt down!");
             InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.DOWN );
 		}
 		else if( IsClickLaBaBt && 0x00 == (buffer[9]&0x04) ) {
 			IsClickLaBaBt = false;
             // ScreenLog.Log("game LaBaBt up!");
-            Debug.Log("game LaBaBt up!");
+            //Debug.Log("game LaBaBt up!");
             InputEventCtrl.GetInstance().ClickLaBaBt( ButtonState.UP );
 		}
     }
