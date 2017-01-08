@@ -236,10 +236,12 @@ public class ReadGameInfo : MonoBehaviour
 
     /* 为了兼容性保留的废弃旧函数 */
 
+    [Obsolete("ReadStarCoinNumSet has been deprecated. Use property CoinToStart instead.")]
     public string ReadStarCoinNumSet()
     {
-        return Convert.ToString(START_COIN);
+        return Convert.ToString(CoinToStart);
     }
+    [Obsolete("WriteStarCoinNumSet has been deprecated. Use property CoinToStart instead.")]
     public void WriteStarCoinNumSet(string value)
     {
         int tmp_coin_to_start;
@@ -254,19 +256,23 @@ public class ReadGameInfo : MonoBehaviour
         }
     }
 
+    [Obsolete("ReadGameStarMode has been deprecated. Use property GameMode instead.")]
     public string ReadGameStarMode()
     {
-        return (GAME_MODE == MODE_FREEPLAY) ? "FREE" : "oper";
+        return (GameMode == MODE_FREEPLAY) ? "FREE" : "oper";
     }
+    [Obsolete("WriteGameStarMode has been deprecated. Use property GameMode instead.")]
     public void WriteGameStarMode(string mode_str)
     {
-        GAME_MODE = mode_str.Equals("FREE") ? MODE_FREEPLAY : MODE_OPERATOR;
+        GameMode = mode_str.Equals("FREE") ? MODE_FREEPLAY : MODE_OPERATOR;
     }
 
+    [Obsolete("ReadInsertCoinNum has been deprecated. Use property InsertCoin instead.")]
     public string ReadInsertCoinNum()
     {
         return Convert.ToString(InsertCoin);
     }
+    [Obsolete("WriteInsertCoinNum has been deprecated. Use property InsertCoin instead.")]
     public void WriteInsertCoinNum(string value)
     {
         int tmp_InsertCoin;
@@ -281,28 +287,34 @@ public class ReadGameInfo : MonoBehaviour
         }
     }
 
+    [Obsolete("ReadPlayerMinSpeedVal has been deprecated. Use property PlayerSpeedMin instead.")]
     public int ReadPlayerMinSpeedVal()
     {
         return PlayerSpeedMin;
     }
+    [Obsolete("WritePlayerMinSpeedVal has been deprecated. Use property PlayerSpeedMin instead.")]
     public void WritePlayerMinSpeedVal(int value)
     {
         PlayerSpeedMin = value;
     }
 
+    [Obsolete("ReadGameRecord has been deprecated. Use property GameRecord instead.")]
     public int ReadGameRecord()
     {
         return GameRecord;
     }
+    [Obsolete("WriteGameRecord has been deprecated. Use property GameRecord instead.")]
     public void WriteGameRecord(int value)
     {
         GameRecord = value;
     }
 
+    [Obsolete("WriteGameAudioVolume has been deprecated. Use property AudioVolume instead.")]
     public void WriteGameAudioVolume(int value)
     {
         AudioVolume = value;
     }
+    [Obsolete("ReadGameAudioVolume has been deprecated. Use property AudioVolume instead.")]
     public int ReadGameAudioVolume()
     {
         return AudioVolume;
