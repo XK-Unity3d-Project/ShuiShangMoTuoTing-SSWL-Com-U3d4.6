@@ -43,6 +43,7 @@ public class ReadGameInfo : MonoBehaviour
     const int Default_BrakeMax = STM32_ADC_MAX;
 
     const int Default_Grade = 2;
+    const GameTextType Default_Language = GameTextType.Chinese;
 
     // knuconfig 会遍历配置文件的每一行，依次解析出设定项目和值，并传递给此函数
     // 此函数根据情况，将字符串解析成属性的真实类型
@@ -159,112 +160,112 @@ public class ReadGameInfo : MonoBehaviour
         return Instance;
     }
 
-    private int START_COIN = Default_CoinToStart;
+    private int START_COIN_ = Default_CoinToStart;
     private int CoinToStart
     {
-        get { return Math.Max(1, START_COIN); }
-        set { START_COIN = Math.Max(value, 1); }
+        get { return Math.Max(1, START_COIN_); }
+        set { START_COIN_ = Math.Max(value, 1); }
     }
 
     const int MODE_OPERATOR = 0;
     const int MODE_FREEPLAY = 1;
-    private int GAME_MODE = Default_GameMode;
+    private int GAME_MODE_ = Default_GameMode;
     private int GameMode
     {
-        get { return GAME_MODE; }
-        set { GAME_MODE = (value == MODE_FREEPLAY) ? MODE_FREEPLAY : MODE_OPERATOR; }
+        get { return GAME_MODE_; }
+        set { GAME_MODE_ = (value == MODE_FREEPLAY) ? MODE_FREEPLAY : MODE_OPERATOR; }
     }
 
-    private int INSERT_COIN = Default_InsertCoin;
+    private int INSERT_COIN_ = Default_InsertCoin;
     private int InsertCoin
     {
-        get { return Math.Max(INSERT_COIN, 0); }
-        set { INSERT_COIN = Math.Max(value, 0); }
+        get { return Math.Max(INSERT_COIN_, 0); }
+        set { INSERT_COIN_ = Math.Max(value, 0); }
     }
 
-    private int GAME_RECORD = Default_GameRecord;
+    private int GAME_RECORD_ = Default_GameRecord;
     private int GameRecord
     {
-        get { return Math.Max(GAME_RECORD, 0); }
-        set { GAME_RECORD = Math.Max(value, 0); }
+        get { return Math.Max(GAME_RECORD_, 0); }
+        set { GAME_RECORD_ = Math.Max(value, 0); }
     }    
 
-    private int PLAYER_SPEED_MIN = Default_PlayerSpeedMin;
+    private int PLAYER_SPEED_MIN_ = Default_PlayerSpeedMin;
     private int PlayerSpeedMin
     {
-        get { return PLAYER_SPEED_MIN; }
-        set { PLAYER_SPEED_MIN = Mathf.Clamp(value, 0, 80); }
+        get { return PLAYER_SPEED_MIN_; }
+        set { PLAYER_SPEED_MIN_ = Mathf.Clamp(value, 0, 80); }
     }
 
-    private int AUDIO_VOLUME = Default_AudioVolume;
+    private int AUDIO_VOLUME_ = Default_AudioVolume;
     private int AudioVolume
     {
-        get { return Mathf.Clamp(AUDIO_VOLUME, 0, 10); }
-        set { AUDIO_VOLUME = Mathf.Clamp(value, 0, 10); }
+        get { return Mathf.Clamp(AUDIO_VOLUME_, 0, 10); }
+        set { AUDIO_VOLUME_ = Mathf.Clamp(value, 0, 10); }
     }    
 
-    private int STEER_MIN = Default_SteerMin;     // BikeDirMin;
+    private int STEER_MIN_ = Default_SteerMin;     // BikeDirMin;
     public int SteerMin
     {
-        get { return Mathf.Clamp(STEER_MIN, 0, STEER_CENTER); }
-        set { STEER_MIN = Mathf.Clamp(value, 0, STEER_CENTER); }
+        get { return Mathf.Clamp(STEER_MIN_, 0, STEER_CENTER_); }
+        set { STEER_MIN_ = Mathf.Clamp(value, 0, STEER_CENTER_); }
     }
 
-    private int STEER_CENTER = Default_SteerCenter;  // BikeDirCen;
+    private int STEER_CENTER_ = Default_SteerCenter;  // BikeDirCen;
     public int SteerCenter
     {
-        get { return STEER_CENTER; }
-        set { STEER_CENTER = Mathf.Clamp(value, STEER_MIN, STEER_MAX); }
+        get { return STEER_CENTER_; }
+        set { STEER_CENTER_ = Mathf.Clamp(value, STEER_MIN_, STEER_MAX_); }
     }
 
-    private int STEER_MAX = Default_SteerMax;
+    private int STEER_MAX_ = Default_SteerMax;
     public int SteerMax
     {
-        get { return STEER_MAX; }
-        set { STEER_MAX = Mathf.Clamp(value, STEER_CENTER, STM32_ADC_MAX); }
+        get { return STEER_MAX_; }
+        set { STEER_MAX_ = Mathf.Clamp(value, STEER_CENTER_, STM32_ADC_MAX); }
     }
 
-    private int THRUST_MIN = Default_ThrustMin;    // BikePowerMin
+    private int THRUST_MIN_ = Default_ThrustMin;    // BikePowerMin
     public int ThrustMin
     {
-        get { return THRUST_MIN; }
-        set { THRUST_MIN = Mathf.Clamp(value, 0, THRUST_MAX); }
+        get { return THRUST_MIN_; }
+        set { THRUST_MIN_ = Mathf.Clamp(value, 0, THRUST_MAX_); }
     }
 
-    private int THRUST_MAX = Default_ThrustMax;
+    private int THRUST_MAX_ = Default_ThrustMax;
     public int ThrustMax
     {
-        get { return THRUST_MAX; }
-        set { THRUST_MAX = Mathf.Clamp(value, THRUST_MIN, STM32_ADC_MAX); }
+        get { return THRUST_MAX_; }
+        set { THRUST_MAX_ = Mathf.Clamp(value, THRUST_MIN_, STM32_ADC_MAX); }
     }
 
-    private int BRAKE_MIN = Default_BrakeMin;     // BikeShaCheMin
+    private int BRAKE_MIN_ = Default_BrakeMin;     // BikeShaCheMin
     public int BrakeMin
     {
-        get { return BRAKE_MIN; }
-        set { BRAKE_MIN = Mathf.Clamp(value, 0, THRUST_MAX); }
+        get { return BRAKE_MIN_; }
+        set { BRAKE_MIN_ = Mathf.Clamp(value, 0, BRAKE_MAX_); }
     }
 
-    private int BRAKE_MAX = Default_BrakeMax;
+    private int BRAKE_MAX_ = Default_BrakeMax;
     public int BrakeMax
     {
-        get { return BRAKE_MAX; }
-        set { BRAKE_MAX = Mathf.Clamp(value, BRAKE_MIN, STM32_ADC_MAX); }
+        get { return BRAKE_MAX_; }
+        set { BRAKE_MAX_ = Mathf.Clamp(value, BRAKE_MIN_, STM32_ADC_MAX); }
     }
 
-    private int GRADE = Default_Grade;
+    private int GRADE_ = Default_Grade;
     public int Grade
     {
-        get { return GRADE; }
+        get { return GRADE_; }
         set {
             switch (value) {
                 case 1:  // Easy
                 case 2:  // Normal
                 case 3:  // Difficult
-                    GRADE = value;
+                    GRADE_ = value;
                     break;
                 default:
-                    GRADE = 2;
+                    GRADE_ = 2;
                     break;
             }
         }
