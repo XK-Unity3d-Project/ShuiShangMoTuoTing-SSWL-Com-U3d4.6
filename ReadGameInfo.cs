@@ -45,6 +45,8 @@ public class ReadGameInfo : MonoBehaviour
     const int Default_Grade = 2;
     const GameTextType Default_Language = GameTextType.Chinese;
 
+    const int Default_SteerForce = 75;
+
     // knuconfig 会遍历配置文件的每一行，依次解析出设定项目和值，并传递给此函数
     // 此函数根据情况，将字符串解析成属性的真实类型
     private void ItemToProperty(string name, string value)
@@ -104,6 +106,9 @@ public class ReadGameInfo : MonoBehaviour
                         Language = Default_Language;
                     }
                     break;
+                case "SteerForce":
+                    SteerForce = int.TryParse(value, out tmp) ? tmp : Default_SteerForce;
+                    break;
             }
         }
         catch {
@@ -134,6 +139,8 @@ public class ReadGameInfo : MonoBehaviour
 
         // enum 类型，保存到文件的时候，还是转 int 方便
         item.Add(String.Format("{0} = {1}", "Language", (int)Language));
+
+        item.Add(String.Format("{0} = {1}", "SteerForce", SteerForce));
 
         return item.ToArray();
     }
@@ -268,6 +275,14 @@ public class ReadGameInfo : MonoBehaviour
         set { LANGUAGE_ = value; }
     }
 
+    // SteerForce 是一个百分数的分母部分
+    private int STEER_FORCE_ = Default_SteerForce;
+    public int SteerForce
+    {
+        get { return STEER_FORCE_; }
+        set { STEER_FORCE_ = Mathf.Clamp(value, 0, 100); }
+    }
+
     void InitGameInfo()
 	{
         Load();
@@ -296,6 +311,9 @@ public class ReadGameInfo : MonoBehaviour
 
         // 在没有加到设定界面之前，保持不变，否则执行一次，英文节目会永久性变成中文
         // Language = GameTextType.Chinese;
+
+        // 在没有加到设定界面之前，保持不变，否则执行一次，又会变成 65% 力量
+        // SteerForce = Default_SteerForce;
     }
 
     /* 为了兼容性保留的废弃旧函数 */

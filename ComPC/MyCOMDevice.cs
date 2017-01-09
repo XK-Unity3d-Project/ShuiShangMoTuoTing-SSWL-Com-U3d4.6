@@ -99,13 +99,17 @@ public class GkioPort
         gkio_write_read(CMD_SUB_COIN, rbuf);
     }
 
-    // 初始化方向盘的状态，回中位置等。一般方向盘的位置在 0xAA 附近
+    private byte SteerForce_ = 75;
+
+    // 初始化方向盘的状态，回中位置，振动力量等。一般方向盘的位置在 0xAA 附近
     // 正常情况下，设置方向盘的初始参数，这个初始化动作，应该在 Open() 打开端口
     // 以后，做一次就行了。但是那样会出错，所有后续读 gkio 板都返回全 0
     // 所以只能在每一次 write 到 gkio 的时候反复调用 InitWheel。
     // 通过 wheelInited 标记来保证只执行一次，但还是不灵，IO 经常会出错，返回 -5
-    public void InitWheel(uint knuWheelCenter)
+    public void InitWheel(uint knuWheelCenter, byte SteerForce)
     {
+        SteerForce_ = SteerForce;
+
         // 回中的意思是回到 "方向盘左边界" 和 "方向盘右边界" 指定的一个小区域
         byte[] CMD_SET_WHEEL = {  // 方向盘力反馈指令
             0x21,        // 包头
@@ -293,14 +297,15 @@ public class GkioPort
             SubCoin(knuPkt[3]);
         }
 
-        InitWheel(pcvr.SteerValCen);
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        InitWheel(pcvr.SteerValCen, (byte)conf.SteerForce);
 
         // knuPkt[4] 是气囊和开始灯
         setGascell(knuPkt[4]);
 
         // knuPkt[6] 是方向盘振动和力
         const byte MOTOR_POWER_OFF = 0;
-        const byte MOTOR_FULL_POWER = 65;  // 玩家反映设为 100 满载时力太大
+        //const byte MOTOR_FULL_POWER = 65;  // 玩家反映设为 100 满载时力太大
 
         //Debug.Log(String.Format("Write() called. The wheel power byte is : {0:X2}", knuPkt[6]));
 
@@ -312,7 +317,7 @@ public class GkioPort
                 shakeWheel();
                 break;            
             case 0xaa:  // 开始游戏，打开电机电源，方向盘自动回中
-                setMoterPower(MOTOR_FULL_POWER);
+                setMoterPower(SteerForce_);
                 break;
             default:    // 到这里说明出错，为了安全，先关闭电机
                 setMoterPower(MOTOR_POWER_OFF);
