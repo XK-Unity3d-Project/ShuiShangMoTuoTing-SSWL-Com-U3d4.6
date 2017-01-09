@@ -109,9 +109,10 @@ public class ReadGameInfo : MonoBehaviour
                 return;
             }
             if (String.Equals(name, "Language")) {
-                bool success = int.TryParse(value, out tmp);
-                if (success) {
-                    Language = (tmp == 0) ? GameTextType.Chinese : GameTextType.English;
+                if (int.TryParse(value, out tmp) &&              // 字符串为合法整数
+                    Enum.IsDefined(typeof(GameTextType), tmp))   // 且可用 GameTextType 类型表示
+                {
+                    Language = (GameTextType)tmp;
                 } else {
                     Language = Default_Language;
                 }
@@ -143,7 +144,9 @@ public class ReadGameInfo : MonoBehaviour
         item.Add(String.Format("{0} = {1}", "BrakeMin", BrakeMin));
         item.Add(String.Format("{0} = {1}", "BrakeMax", BrakeMax));
         item.Add(String.Format("{0} = {1}", "Grade", Grade));
-        item.Add(String.Format("{0} = {1}", "Language", Language == GameTextType.Chinese ? 0 : 1));
+
+        // enum 类型，保存到文件的时候，还是转 int 方便
+        item.Add(String.Format("{0} = {1}", "Language", (int)Language));
 
         return item.ToArray();
     }
