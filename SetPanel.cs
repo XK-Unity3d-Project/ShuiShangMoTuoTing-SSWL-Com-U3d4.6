@@ -537,7 +537,9 @@ public class SetPanel : MonoBehaviour
 
 	void ResetFactory()
 	{
-		ReadGameInfo.GetInstance().FactoryReset();
+        ReadGameInfo conf = ReadGameInfo.GetInstance();
+        conf.FactoryReset();
+
 		PlayerMinSpeed.text = "0";
 		m_CoinForStar.text = "1";
 		m_GameModeDuigou1.enabled = true;
@@ -545,12 +547,31 @@ public class SetPanel : MonoBehaviour
 		GameAudioVolume = 7;
 		GameAudioVolumeLB.text = GameAudioVolume.ToString();
 
-		if (pcvr.bIsHardWare) {
+        if (pcvr.bIsHardWare) {
 			pcvr.GetInstance().SubPlayerCoin(m_InserNum);
 		}
 		m_InserNum = 0;
 		UpdateInsertCoin();
-	}
+
+        switch (conf.Grade) {
+            case 1:
+                GameGradeDuiGou[0].enabled = true;
+                GameGradeDuiGou[1].enabled = false;
+                GameGradeDuiGou[2].enabled = false;
+                break;
+            case 3:
+                GameGradeDuiGou[0].enabled = false;
+                GameGradeDuiGou[1].enabled = false;
+                GameGradeDuiGou[2].enabled = true;
+                break;
+            case 2:
+            default: // 默认设置为普通难度
+                GameGradeDuiGou[0].enabled = false;
+                GameGradeDuiGou[1].enabled = true;
+                GameGradeDuiGou[2].enabled = false;
+                break;
+        }
+    }
 
 	void ClickShaCheBtEvent(ButtonState val)
 	{
