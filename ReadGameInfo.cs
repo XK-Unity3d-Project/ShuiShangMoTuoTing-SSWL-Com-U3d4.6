@@ -199,8 +199,9 @@ public class ReadGameInfo : MonoBehaviour
     {
         get { return Mathf.Clamp(AUDIO_VOLUME_, 0, 10); }
         set { AUDIO_VOLUME_ = Mathf.Clamp(value, 0, 10); }
-    }    
+    }
 
+    // 注意，摩托艇的方向盘，转到最左边，电位器读数 SteerMin 反而最大；转到最右边，电位器读数 SteerMax 其实最小
     private int STEER_MIN_ = Default_SteerMin;     // BikeDirMin;
     public int SteerMin
     {
