@@ -8,7 +8,7 @@ namespace Knu
 
     class knuconfig
     {
-        protected const string CONF_DIRECTORY = @"../conf/";
+        protected const string CONF_DIRECTORY = @"./conf/";
         protected string CONF_FILE;
 
         public knuconfig(string conf_file_name, DelegateItemToProperty runItemToProperty, DelegatePropertyToItem runPropertyToItem)
