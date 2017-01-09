@@ -306,6 +306,9 @@ public class ReadGameInfo : MonoBehaviour
         BrakeMax = Default_BrakeMax;
 
         Grade = Default_Grade;
+
+        // 在没有加到设定界面之前，保持不变，否则执行一次，英文节目会永久性变成中文
+        // Language = GameTextType.Chinese;
     }
 
     /* 为了兼容性保留的废弃旧函数 */
