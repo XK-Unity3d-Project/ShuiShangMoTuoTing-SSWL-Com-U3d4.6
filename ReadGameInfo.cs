@@ -52,71 +52,58 @@ public class ReadGameInfo : MonoBehaviour
         try {
             int tmp;
 
-            if (String.Equals(name, "CoinToStart")) {
-                CoinToStart = int.TryParse(value, out tmp) ? tmp : Default_CoinToStart;
-                return;
-            }
-            if (String.Equals(name, "GameMode")) {
-                GameMode = int.TryParse(value, out tmp) ? tmp : Default_GameMode;
-                return;
-            }
-            if (String.Equals(name, "InsertCoin")) {
-                InsertCoin = int.TryParse(value, out tmp) ? tmp : Default_InsertCoin;
-                return;
-            }
-            if (String.Equals(name, "GameRecord")) {
-                GameRecord = int.TryParse(value, out tmp) ? tmp : Default_GameRecord;
-                return;
-            }
-            if (String.Equals(name, "PlayerSpeedMin")) {
-                PlayerSpeedMin = int.TryParse(value, out tmp) ? tmp : Default_PlayerSpeedMin;
-                return;
-            }
-            if (String.Equals(name, "AudioVolume")) {
-                AudioVolume = int.TryParse(value, out tmp) ? tmp : Default_AudioVolume;
-                return;
-            }
-            if (String.Equals(name, "SteerMin")) {
-                SteerMin = int.TryParse(value, out tmp) ? tmp : Default_SteerMin;
-                return;
-            }
-            if (String.Equals(name, "SteerCenter")) {
-                SteerCenter = int.TryParse(value, out tmp) ? tmp : Default_SteerCenter;
-                return;
-            }
-            if (String.Equals(name, "SteerMax")) {
-                SteerMax = int.TryParse(value, out tmp) ? tmp : Default_SteerMax;
-                return;
-            }
-            if (String.Equals(name, "ThrustMin")) {
-                ThrustMin = int.TryParse(value, out tmp) ? tmp : Default_ThrustMin;
-                return;
-            }
-            if (String.Equals(name, "ThrustMax")) {
-                ThrustMax = int.TryParse(value, out tmp) ? tmp : Default_ThrustMax;
-                return;
-            }
-            if (String.Equals(name, "BrakeMin")) {
-                BrakeMin = int.TryParse(value, out tmp) ? tmp : Default_BrakeMin;
-                return;
-            }
-            if (String.Equals(name, "BrakeMax")) {
-                BrakeMax = int.TryParse(value, out tmp) ? tmp : Default_BrakeMax;
-                return;
-            }
-            if (String.Equals(name, "Grade")) {
-                Grade = int.TryParse(value, out tmp) ? tmp : Default_Grade;
-                return;
-            }
-            if (String.Equals(name, "Language")) {
-                if (int.TryParse(value, out tmp) &&              // 字符串为合法整数
-                    Enum.IsDefined(typeof(GameTextType), tmp))   // 且可用 GameTextType 类型表示
-                {
-                    Language = (GameTextType)tmp;
-                } else {
-                    Language = Default_Language;
-                }
-                return;
+            switch (name) {
+                case "CoinToStart":
+                    CoinToStart = int.TryParse(value, out tmp) ? tmp : Default_CoinToStart;
+                    break;
+                case "GameMode":
+                    GameMode = int.TryParse(value, out tmp) ? tmp : Default_GameMode;
+                    break;
+                case "InsertCoin":
+                    InsertCoin = int.TryParse(value, out tmp) ? tmp : Default_InsertCoin;
+                    break;
+                case "GameRecord":
+                    GameRecord = int.TryParse(value, out tmp) ? tmp : Default_GameRecord;
+                    break;
+                case "PlayerSpeedMin":
+                    PlayerSpeedMin = int.TryParse(value, out tmp) ? tmp : Default_PlayerSpeedMin;
+                    break;
+                case "AudioVolume":
+                    AudioVolume = int.TryParse(value, out tmp) ? tmp : Default_AudioVolume;
+                    break;
+                case "SteerMin":
+                    SteerMin = int.TryParse(value, out tmp) ? tmp : Default_SteerMin;
+                    break;
+                case "SteerCenter":
+                    SteerCenter = int.TryParse(value, out tmp) ? tmp : Default_SteerCenter;
+                    break;
+                case "SteerMax":
+                    SteerMax = int.TryParse(value, out tmp) ? tmp : Default_SteerMax;
+                    break;
+                case "ThrustMin":
+                    ThrustMin = int.TryParse(value, out tmp) ? tmp : Default_ThrustMin;
+                    break;
+                case "ThrustMax":
+                    ThrustMax = int.TryParse(value, out tmp) ? tmp : Default_ThrustMax;
+                    break;
+                case "BrakeMin":
+                    BrakeMin = int.TryParse(value, out tmp) ? tmp : Default_BrakeMin;
+                    break;
+                case "BrakeMax":
+                    BrakeMax = int.TryParse(value, out tmp) ? tmp : Default_BrakeMax;
+                    break;
+                case "Grade":
+                    Grade = int.TryParse(value, out tmp) ? tmp : Default_Grade;
+                    break;
+                case "Language":
+                    if (int.TryParse(value, out tmp) &&              // 字符串为合法整数
+                        Enum.IsDefined(typeof(GameTextType), tmp))   // 且可用 GameTextType 类型表示
+                    {
+                        Language = (GameTextType)tmp;
+                    } else {
+                        Language = Default_Language;
+                    }
+                    break;
             }
         }
         catch {
