@@ -107,6 +107,15 @@ public class ReadGameInfo : MonoBehaviour
                 Grade = int.TryParse(value, out tmp) ? tmp : Default_Grade;
                 return;
             }
+            if (String.Equals(name, "Language")) {
+                bool success = int.TryParse(value, out tmp);
+                if (success) {
+                    Language = (tmp == 0) ? GameTextType.Chinese : GameTextType.English;
+                } else {
+                    Language = Default_Language;
+                }
+                return;
+            }
         }
         catch {
             // 解码配置文件时出错，下一行继续解码。场地可使用 "恢复工厂默认" 功能修正此问题
@@ -133,6 +142,7 @@ public class ReadGameInfo : MonoBehaviour
         item.Add(String.Format("{0} = {1}", "BrakeMin", BrakeMin));
         item.Add(String.Format("{0} = {1}", "BrakeMax", BrakeMax));
         item.Add(String.Format("{0} = {1}", "Grade", Grade));
+        item.Add(String.Format("{0} = {1}", "Language", Language == GameTextType.Chinese ? 0 : 1));
 
         return item.ToArray();
     }
@@ -258,6 +268,13 @@ public class ReadGameInfo : MonoBehaviour
                     break;
             }
         }
+    }
+
+    private GameTextType LANGUAGE_ = Default_Language;
+    public GameTextType Language
+    {
+        get { return LANGUAGE_; }
+        set { LANGUAGE_ = value; }
     }
 
     void InitGameInfo()
