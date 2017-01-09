@@ -34,8 +34,8 @@ public class ReadGameInfo : MonoBehaviour
     const int Default_GameRecord = 0;
     const int Default_PlayerSpeedMin = 0;
     const int Default_AudioVolume = 7;
-    const int Default_SteerMin = 0;
-    const int Default_SteerMax = STM32_ADC_MAX;
+    const int Default_SteerMin = STM32_ADC_MAX;  // 这是方向盘左极限，实际机台的电位器读数反而最大
+    const int Default_SteerMax = 0;
     const int Default_SteerCenter = (Default_SteerMax + Default_SteerMin) / 2;
     const int Default_ThrustMin = 0;
     const int Default_ThrustMax = STM32_ADC_MAX;
@@ -205,22 +205,22 @@ public class ReadGameInfo : MonoBehaviour
     private int STEER_MIN_ = Default_SteerMin;     // BikeDirMin;
     public int SteerMin
     {
-        get { return Mathf.Clamp(STEER_MIN_, 0, STEER_CENTER_); }
-        set { STEER_MIN_ = Mathf.Clamp(value, 0, STEER_CENTER_); }
+        get { return STEER_MIN_; }
+        set { STEER_MIN_ = Mathf.Clamp(value, 0, STM32_ADC_MAX); }
     }
 
     private int STEER_CENTER_ = Default_SteerCenter;  // BikeDirCen;
     public int SteerCenter
     {
         get { return STEER_CENTER_; }
-        set { STEER_CENTER_ = Mathf.Clamp(value, STEER_MIN_, STEER_MAX_); }
+        set { STEER_CENTER_ = Mathf.Clamp(value, 0, STM32_ADC_MAX); }
     }
 
     private int STEER_MAX_ = Default_SteerMax;
     public int SteerMax
     {
         get { return STEER_MAX_; }
-        set { STEER_MAX_ = Mathf.Clamp(value, STEER_CENTER_, STM32_ADC_MAX); }
+        set { STEER_MAX_ = Mathf.Clamp(value, 0, STM32_ADC_MAX); }
     }
 
     private int THRUST_MIN_ = Default_ThrustMin;    // BikePowerMin
