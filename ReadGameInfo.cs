@@ -283,6 +283,8 @@ public class ReadGameInfo : MonoBehaviour
 
         BrakeMin = Default_BrakeMin;
         BrakeMax = Default_BrakeMax;
+
+        Grade = Default_Grade;
     }
 
     /* 为了兼容性保留的废弃旧函数 */
