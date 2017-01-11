@@ -53,12 +53,14 @@ public class GkioPort
 
     static public int gkio_write_read(byte[] write_buf, byte[] read_buf)
     {
-        int ret1, ret2;
+        int ret;
 
-        ret1 = _gkio_write(write_buf, write_buf.Length);
-        ret2 = _gkio_read(read_buf, read_buf.Length);
+        ret = _gkio_write(write_buf, write_buf.Length);
+        if (ret > 0) {
+            ret = _gkio_read(read_buf, read_buf.Length);
+        }
 
-        return ret2;
+        return ret;
     }
 
     public void Open()
