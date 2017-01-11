@@ -43,10 +43,10 @@ namespace Knu
                     string[] confLines = File.ReadAllLines(CONF_FILE, Encoding.UTF8);
 
                     // 应检查文件有效性，头部尾部什么的
-                    foreach (string e in confLines) {
+                    foreach (string line in confLines) {
                         string name, value;
 
-                        bool isValidLine = DecodeLine(e, out name, out value);
+                        bool isValidLine = DecodeLine(line, out name, out value);
 
                         if (isValidLine) {
                             ItemToProperty(name, value);
@@ -77,8 +77,8 @@ namespace Knu
 
                 sr.WriteLine("");
 
-                foreach (string e in tmp_item) {
-                    sr.WriteLine(e);
+                foreach (string line in tmp_item) {
+                    sr.WriteLine(line);
                 }
 
                 sr.WriteLine("");
