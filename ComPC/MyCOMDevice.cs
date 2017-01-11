@@ -101,6 +101,29 @@ public class GkioPort
         gkio_write_read(CMD_SUB_COIN, rbuf);
     }
 
+    /* 设置路面情况。经常不灵，所以不用
+    const byte ROAD_SMOOTH = 0;
+    const byte ROAD_SAND = 1;
+    public void SetRoad(byte roadType, Int16 power) {
+        // 路面设定，让摩托艇方向盘始终有一个最基本的轻微振动感
+        byte[] CMD_SET_ROAD = {  // 路面设置指令
+            0x22,                // 包头
+            CHANNEL_ROAD,        // 特效通道，默认 2，范围 0 到 9
+            0x00,                // 路面类型，1，沙路。默认 5，坑洼路面。0 为平滑路面
+            0x03, 0xe8,          // 特效力道，2 个字节范围  00 00 到 03 E8
+            0x00, 0x00, 0x00,    // 不知道，协议说明上指定为 0
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+        };
+
+        CMD_SET_ROAD[2] = roadType;
+        CMD_SET_ROAD[3] = (byte)(power >> 8);
+        CMD_SET_ROAD[4] = (byte)((power << 8) >> 8);
+
+        // 返回的 rbuf[0] 应该是 0x22
+        int ret = gkio_write_read(CMD_SET_ROAD, rbuf);
+    }
+    */
+
     private byte SteerForce_ = 75;
 
     // 初始化方向盘的状态，回中位置，振动力量等。一般方向盘的位置在 0xAA 附近
