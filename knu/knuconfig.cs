@@ -1,4 +1,36 @@
-﻿using System.IO;
+﻿/*
+ Windows 下 unity3d 的 PlayerPrefs 把数据保存在注册表里（linux 下在 ~/.config/ 目录下），
+ 注册表是一个带缓存的大数据库，并不一定马上写入磁盘。这就存在一个比较严重的缺陷，就是写入的
+ 配置数据，在突然断电后，可能部分设定，比如几币一玩，没有保存，下次重新开机，还是旧数据。
+
+ 现改为用 ./conf/mtt.conf 文本文件作为配置文件，用记事本打开后，类似这样
+
+ CoinToStart = 5
+ Volumn = 0
+ FreePlay = 0
+
+ 写的时候，有留意以下几点
+ 1) 仅在游戏启动时，读取配置的时候，以只读方式在几十毫秒内打开文件。
+    仅在退出设置画面时候，写入配置文件的几十毫秒内，机台断电，文件内容有可能是不完整的。
+    其它时候基本没有损坏文件的可能。
+ 2) 通过 FileOptions.WriteThrough 参数， 指定文件内容不缓存，立即保存到物理硬盘。
+    防止短时间内机台断电后，新数据没有保存，重新开机还是旧数据
+ 3) xml 格式也可做到，但文件比较复杂，不容易阅读
+ 4) json 格式最佳，但 unity3d 4.x 没带
+
+ 通过委托 delegate 实现。而不是继承一个子类覆盖 ItemToProperty / PropertyToItem 这
+ 2 个方法，主要是因为用到 knuconfig 的对象，一般已经继承了其它类，比如 MonoBehaviour
+
+初步测试结果
+
+ 一块高科 USB IO 板，一输出，用 2 条线，直接接电脑主板上的 RESET 针脚和 GND 针脚
+ 测试程序，每次开机后自动启动，先读取配置文件中的 RESET 次数记录，然后 +1 保存，最后
+ 指令 IO 板，发出 RESET 信号，将主板重启。
+
+ 一个周末大约循环重启 3800 次左右，配置文件正常
+ */
+
+using System.IO;
 using System.Text;
 
 namespace Knu
@@ -26,12 +58,13 @@ namespace Knu
                 Directory.CreateDirectory(CONF_DIRECTORY);
             }
 
-            /*if (!File.Exists(CONF_FILE)) {
+            /* 出厂没有配置文件，自动取默认值。进设定菜单一次，退出的时候自动保存文件，就有配置文件了。
+             * if (!File.Exists(CONF_FILE)) {
                 File.Create();
             }*/
         }
 
-        /* Windows only
+        /* Windows 下有效
         [DllImport("Kernel32.dll", EntryPoint = "FlushFileBuffers")]
         static extern int FlushFileBuffers(Microsoft.Win32.SafeHandles.SafeFileHandle hFile);
         */
@@ -66,6 +99,8 @@ namespace Knu
             //Console.WriteLine("coin_to_start : {0}, volumn : {1}, free_play : {2}", coin_to_start, volumn, free_play);
 
             // .net 4.0 或以上，可以直接 fs.Flush(true)，直接写到物理磁盘
+            // Winddows 下可以直接 import 标准的 Win32 函数 FlushFileBuffers，指令文件立即写入物理磁盘，Linux 下为标准 C 库
+            // 的 int fflush ( FILE * stream ); 函数
             // unity3d 自带的早期版本，可指定文件为 WriteThrough，即不缓冲，直接写入磁盘
             FileStream fs = new FileStream(CONF_FILE, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough);
             StreamWriter sr = new StreamWriter(fs, Encoding.UTF8);
