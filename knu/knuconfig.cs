@@ -6,7 +6,7 @@
  现改为用 ./conf/mtt.conf 文本文件作为配置文件，用记事本打开后，类似这样
 
  CoinToStart = 5
- Volumn = 0
+ Volume = 0
  FreePlay = 0
 
  写的时候，有留意以下几点
@@ -23,9 +23,9 @@
 
 初步测试结果
 
- 一块高科 USB IO 板，一输出，用 2 条线，直接接电脑主板上的 RESET 针脚和 GND 针脚
- 测试程序，每次开机后自动启动，先读取配置文件中的 RESET 次数记录，然后 +1 保存，最后
- 指令 IO 板，发出 RESET 信号，将主板重启。
+ 一块高科 USB IO 板，使用一个控制气囊的输出针，用 2 条线，直接接电脑主板上的 RESET 针
+ 脚和 GND 针脚测试程序，每次开机后自动启动，先读取配置文件中的 RESET 次数记录，然后 +1
+ 保存，最后指令 IO 板，发出 RESET 信号，将主板重启。
 
  一个周末大约循环重启 3800 次左右，配置文件正常
  */
@@ -75,7 +75,7 @@ namespace Knu
                 if (File.Exists(CONF_FILE)) {
                     string[] confLines = File.ReadAllLines(CONF_FILE, Encoding.UTF8);
 
-                    // 应检查文件有效性，头部尾部什么的
+                    // 应检查文件有效性，头部尾部标记什么的。不过先略过
                     foreach (string line in confLines) {
                         string name, value;
 
