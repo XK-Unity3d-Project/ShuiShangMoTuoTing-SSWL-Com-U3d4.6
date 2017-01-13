@@ -106,7 +106,7 @@ namespace Knu
             StreamWriter sr = new StreamWriter(fs, Encoding.UTF8);
 
             try {
-                // 尽量预分配能放得下整个配置文件的内容，免得执行过程中还要分配第二次
+                // 尽量预分配能放得下整个配置文件的内容，免得执行过程中还要分配第二次。最终文件的 md5sum 是一样的。
                 StringBuilder strBuf = new StringBuilder(2048);
 
                 strBuf.AppendLine(@"# game config file");
