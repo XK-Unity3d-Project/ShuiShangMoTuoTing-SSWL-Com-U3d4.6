@@ -106,19 +106,25 @@ namespace Knu
             StreamWriter sr = new StreamWriter(fs, Encoding.UTF8);
 
             try {
-                sr.WriteLine(@"# game config file");
-                sr.WriteLine(@"# format : <item>=<value> or <item> = <value>, for instance, coin_to_start=5 / coin_to_start = 5");
-                sr.WriteLine(@"# True/False for boolean, 94 for int, 14.27 for float, string is just string");
+                // 尽量预分配能放得下整个配置文件的内容，免得执行过程中还要分配第二次
+                StringBuilder strBuf = new StringBuilder(2048);
 
-                sr.WriteLine("");
+                strBuf.AppendLine(@"# game config file");
+                strBuf.AppendLine(@"# format : <item>=<value> or <item> = <value>, for instance, coin_to_start=5 / coin_to_start = 5");
+                strBuf.AppendLine(@"# True/False for boolean, 94 for int, 14.27 for float, string is just string");
+
+                strBuf.AppendLine("");
 
                 foreach (string line in tmp_item) {
-                    sr.WriteLine(line);
+                    strBuf.AppendLine(line);
                 }
 
-                sr.WriteLine("");
+                strBuf.AppendLine("");
 
-                sr.WriteLine("# END");
+                strBuf.AppendLine("# END");
+
+                // 用 StringBuilder 构造内容，最后一次性写入，比每次写一行，效率高
+                sr.Write(strBuf.ToString());
             }
             finally {
                 // 文件缓冲写到文件系统，文件系统缓冲写到物理磁盘
