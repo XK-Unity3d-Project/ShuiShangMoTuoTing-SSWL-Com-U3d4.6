@@ -102,11 +102,12 @@ namespace Knu
             // Winddows 下可以直接 import 标准的 Win32 函数 FlushFileBuffers，指令文件立即写入物理磁盘，Linux 下为标准 C 库
             // 的 int fflush ( FILE * stream ); 函数
             // unity3d 自带的早期版本，可指定文件为 WriteThrough，即不缓冲，直接写入磁盘
-            FileStream fs = new FileStream(CONF_FILE, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough);
-            StreamWriter sr = new StreamWriter(fs, Encoding.UTF8);
+            FileStream file = new FileStream(CONF_FILE, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough);
+            StreamWriter fileWriter = new StreamWriter(file, Encoding.UTF8);
 
             try {
-                // 尽量预分配能放得下整个配置文件的内容，免得执行过程中还要分配第二次。最终文件的 md5sum 是一样的。
+                // 尽量预分配能放得下整个配置文件的内容，免得执行过程中还要分配第二次。
+                // 和反复调用 fileWriter.WriteLine()，每次写一行，这样生成的最终文件，他们的 md5sum 是一样的。
                 StringBuilder strBuf = new StringBuilder(2048);
 
                 strBuf.AppendLine(@"# game config file");
@@ -124,14 +125,14 @@ namespace Knu
                 strBuf.AppendLine("# END");
 
                 // 用 StringBuilder 构造内容，最后一次性写入，比每次写一行，效率高
-                sr.Write(strBuf.ToString());
+                fileWriter.Write(strBuf.ToString());
             }
             finally {
                 // 文件缓冲写到文件系统，文件系统缓冲写到物理磁盘
-                sr.Flush();
-                //fs.Flush();
-                //FlushFileBuffers(fs.SafeFileHandle); // 怕 WriteThourgh 不生效
-                sr.Close(); // 会自动 Close 了 fs
+                fileWriter.Flush();
+                //file.Flush();
+                //FlushFileBuffers(file.SafeFileHandle); // 怕 WriteThourgh 不生效
+                fileWriter.Close(); // 会自动 Close 了 fs
             }
         }
 
