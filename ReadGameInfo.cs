@@ -10,22 +10,21 @@ public class ReadGameInfo : MonoBehaviour
 {
     const int STM32_ADC_MAX = 4096;
 
-    private knuconfig kconf_;
+    const string CONFIG_FILE_NAME = "mtt.conf";
 
     private void Awake()
     {
-        kconf_ = new knuconfig(@"mtt.conf", ItemToProperty, PropertyToItem);
-        kconf_.loadFromFile();
+        knuconfig.loadFromFile(CONFIG_FILE_NAME, ItemToProperty);
     }
 
     public void Load()
     {
-        kconf_.loadFromFile();
+        knuconfig.loadFromFile(CONFIG_FILE_NAME, ItemToProperty);
     }
 
     public void Save()
     {
-        kconf_.saveToFile();
+        knuconfig.saveToFile(CONFIG_FILE_NAME, PropertyToItem);
     }
 
     const int Default_CoinToStart = 1;

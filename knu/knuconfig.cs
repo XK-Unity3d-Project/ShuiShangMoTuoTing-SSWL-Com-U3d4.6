@@ -35,25 +35,24 @@ using System.Text;
 
 namespace Knu
 {
+    // 遍历从配置文件读出的字符串，依次解析出设定项目和值，保存到属性，供程序读写
     public delegate void DelegateItemToProperty(string name, string value);
+
+    // 把属性的值，保存到字符串数组，准备写入配置文件
     public delegate string[] DelegatePropertyToItem();
 
-    class knuconfig
+    static class knuconfig
     {
-        protected const string CONF_DIRECTORY = @"./conf/";
-        protected string CONF_FILE;
+        const string CONF_DIRECTORY = @"./conf/";
 
-        public knuconfig(string conf_file_name, DelegateItemToProperty runItemToProperty, DelegatePropertyToItem runPropertyToItem)
+        static private string GetFullPathOfConfFile(string conf_file_name)
         {
-            initConfigFile(conf_file_name);
-
-            ItemToProperty = runItemToProperty;
-            PropertyToItem = runPropertyToItem;
+            string conf_full_path = CONF_DIRECTORY + conf_file_name;
+            return conf_full_path;
         }
 
-        protected void initConfigFile(string conf_file_name)
+        static private void initConfigFile(string conf_file_name)
         {
-            CONF_FILE = CONF_DIRECTORY + conf_file_name;
             if (!Directory.Exists(CONF_DIRECTORY)) {
                 Directory.CreateDirectory(CONF_DIRECTORY);
             }
@@ -69,8 +68,11 @@ namespace Knu
         static extern int FlushFileBuffers(Microsoft.Win32.SafeHandles.SafeFileHandle hFile);
         */
 
-        public void loadFromFile()
+        static public void loadFromFile(string conf_file_name, DelegateItemToProperty ItemToProperty)
         {
+            initConfigFile(conf_file_name);
+
+            string CONF_FILE = GetFullPathOfConfFile(conf_file_name);
             try {
                 if (File.Exists(CONF_FILE)) {
                     string[] confLines = File.ReadAllLines(CONF_FILE, Encoding.UTF8);
@@ -92,8 +94,10 @@ namespace Knu
             }
         }
 
-        public void saveToFile()
+        static public void saveToFile(string conf_file_name, DelegatePropertyToItem PropertyToItem)
         {
+            initConfigFile(conf_file_name);
+
             string[] tmp_item = PropertyToItem();
 
             //Console.WriteLine("coin_to_start : {0}, volumn : {1}, free_play : {2}", coin_to_start, volumn, free_play);
@@ -102,6 +106,7 @@ namespace Knu
             // Winddows 下可以直接 import 标准的 Win32 函数 FlushFileBuffers，指令文件立即写入物理磁盘，Linux 下为标准 C 库
             // 的 int fflush ( FILE * stream ); 函数
             // unity3d 自带的早期版本，可指定文件为 WriteThrough，即不缓冲，直接写入磁盘
+            string CONF_FILE = GetFullPathOfConfFile(conf_file_name);
             FileStream file = new FileStream(CONF_FILE, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough);
             StreamWriter fileWriter = new StreamWriter(file, Encoding.UTF8);
 
@@ -137,7 +142,7 @@ namespace Knu
         }
 
         // 各种字符串合法性检查，防止手写配置文件出错。基本的格式规则放在这里，强制所有配置文件统一格式
-        private bool DecodeLine(string e, out string name, out string value)
+        static private bool DecodeLine(string e, out string name, out string value)
         {
             name = null;
             value = null;
@@ -162,11 +167,5 @@ namespace Knu
 
             return true;
         }
-
-        // 遍历从配置文件读出的字符串，依次解析出设定项目和值，保存到属性，供程序读写
-        private DelegateItemToProperty ItemToProperty;
-
-        // 把属性的值，保存到字符串数组，准备写入配置文件
-        private DelegatePropertyToItem PropertyToItem;
     }
 }
