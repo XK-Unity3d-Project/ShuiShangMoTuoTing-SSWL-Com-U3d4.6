@@ -275,7 +275,7 @@ public class ReadGameInfo : MonoBehaviour
         set { LANGUAGE_ = value; }
     }
 
-    // SteerForce 是一个百分数的分母部分
+    // SteerForce 是一个百分数的分子部分
     private int STEER_FORCE_ = Default_SteerForce;
     public int SteerForce
     {
