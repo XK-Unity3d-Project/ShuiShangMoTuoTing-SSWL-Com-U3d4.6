@@ -58,7 +58,7 @@ namespace Knu
             }
 
             /* 出厂没有配置文件，自动取默认值。进设定菜单一次，退出的时候自动保存文件，就有配置文件了。
-             * if (!File.Exists(CONF_FILE)) {
+            if (!File.Exists(CONF_FILE)) {
                 File.Create();
             }*/
         }
