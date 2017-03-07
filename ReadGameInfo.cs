@@ -44,7 +44,7 @@ public class ReadGameInfo : MonoBehaviour
     const int Default_Grade = 2;
     const GameTextType Default_Language = GameTextType.Chinese;
 
-    const int Default_SteerForce = 75;
+    const int Default_SteerForce = 25;
 
     // knuconfig 会遍历配置文件的每一行，依次解析出设定项目和值，并传递给此函数
     // 此函数根据情况，将字符串解析成属性的真实类型
