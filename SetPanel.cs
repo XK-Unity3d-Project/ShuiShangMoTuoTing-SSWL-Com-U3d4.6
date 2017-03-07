@@ -370,7 +370,7 @@ public class SetPanel : MonoBehaviour
 
         switch (m_IndexZhujiemian)
         {
-            case 0:
+            case 0:  // 启动币数
                 {
                     int CoinNum = Convert.ToInt32(m_CoinForStar.text);
                     CoinNum++;
@@ -382,41 +382,41 @@ public class SetPanel : MonoBehaviour
                     conf.WriteStarCoinNumSet(CoinNum.ToString());
                     break;
                 }
-            case 1:
+            case 1:  // 运营模式
                 {
                     m_GameModeDuigou1.enabled = true;
                     m_GameModeDuigou2.enabled = false;
                     conf.WriteGameStarMode("oper");
                     break;
                 }
-            case 2:
+            case 2:  // 免费模式
                 {
                     m_GameModeDuigou1.enabled = false;
                     m_GameModeDuigou2.enabled = true;
                     conf.WriteGameStarMode("FREE");
                     break;
                 }
-            case 3:
+            case 3:  // 恢复出厂设置
                 {
                     ResetFactory();
                     break;
                 }
-            case 4:
+            case 4:  // 开始按键灯 - 亮
                 {
                     pcvr.StartBtLight = StartLightState.Liang;
                     break;
                 }
-            case 5:
+            case 5:  // 开始按键灯 - 闪
                 {
                     pcvr.StartBtLight = StartLightState.Shan;
                     break;
                 }
-            case 6:
+            case 6:  // 开始按键灯 - 灭
                 {
                     pcvr.StartBtLight = StartLightState.Mie;
                     break;
                 }
-            case 7:
+            case 7:  // 气囊信息 - 前气囊
                 {
                     pcvr.m_IsOpneForwardQinang = true;
                     pcvr.m_IsOpneBehindQinang = false;
@@ -424,7 +424,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = false;
                     break;
                 }
-            case 8:
+            case 8:  // 气囊信息 - 后气囊
                 {
                     pcvr.m_IsOpneForwardQinang = false;
                     pcvr.m_IsOpneBehindQinang = true;
@@ -432,7 +432,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = false;
                     break;
                 }
-            case 9:
+            case 9:  // 气囊信息 - 左气囊
                 {
                     pcvr.m_IsOpneForwardQinang = false;
                     pcvr.m_IsOpneBehindQinang = false;
@@ -440,7 +440,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = false;
                     break;
                 }
-            case 10:
+            case 10: // 气囊信息 - 右气囊
                 {
                     pcvr.m_IsOpneForwardQinang = false;
                     pcvr.m_IsOpneBehindQinang = false;
@@ -448,7 +448,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = true;
                     break;
                 }
-			case 11:
+			case 11:  // 音量设置 - <音量值>
 				{
 					GameAudioVolume++;
 					if (GameAudioVolume > 10) {
@@ -458,14 +458,14 @@ public class SetPanel : MonoBehaviour
 					conf.WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
-			case 12:
-				{
+			case 12:  // 音量设置 - 重置
+                {
 					GameAudioVolume = 7;
 					GameAudioVolumeLB.text = GameAudioVolume.ToString();
 					conf.WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
-            case 13:
+            case 13:  // 初始速度
                 {
                     int speedVal = Convert.ToInt32(PlayerMinSpeed.text);
                     speedVal += 10;
@@ -477,13 +477,13 @@ public class SetPanel : MonoBehaviour
                     conf.WritePlayerMinSpeedVal(speedVal);
                     break;
                 }
-            case 14:
+            case 14:  // 校准
                 {
                     InitJiaoZhunPcvr();
                     break;
                 }
 
-            case 15:
+            case 15:  // 难度 - 简单
 				{
 					GameGradeDuiGou[0].enabled = true;
 					GameGradeDuiGou[1].enabled = false;
@@ -492,8 +492,8 @@ public class SetPanel : MonoBehaviour
                     break;
                 }
 
-            case 16:
-				{
+            case 16:  // 难度 - 正常
+                {
 					GameGradeDuiGou[0].enabled = false;
 					GameGradeDuiGou[1].enabled = true;
 					GameGradeDuiGou[2].enabled = false;
@@ -501,8 +501,8 @@ public class SetPanel : MonoBehaviour
                     break;
                 }
 
-            case 17:                
-				{
+            case 17:  // 难度 - 困难
+                {
 					GameGradeDuiGou[0].enabled = false;
 					GameGradeDuiGou[1].enabled = false;
 					GameGradeDuiGou[2].enabled = true;
@@ -510,7 +510,7 @@ public class SetPanel : MonoBehaviour
                     break;
                 }
 
-            case 18:
+            case 18:  // 退出
                 {
                     conf.Save();
                     CloseAllQiNang();
