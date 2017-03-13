@@ -312,7 +312,7 @@ public class ReadGameInfo : MonoBehaviour
         // 在没有加到设定界面之前，保持不变，否则执行一次，英文节目会永久性变成中文
         // Language = GameTextType.Chinese;
 
-        // 在没有加到设定界面之前，保持不变，否则执行一次，又会变成 65% 力量
+        // 在没有加到设定界面之前，保持不变，否则执行一次，又会变成 Default_SteerForce 力量
         // SteerForce = Default_SteerForce;
     }
 
