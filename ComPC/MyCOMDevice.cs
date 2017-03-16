@@ -70,7 +70,9 @@ public class GkioPort
 
         IsOpen_ = (num_of_gkio != 0);
 
-        //Debug.Log("Open() called and num_of_gkio is : " + num_of_gkio);
+#if UNITY_EDITOR
+        Debug.Log("Open() called and num_of_gkio is : " + num_of_gkio);
+#endif
     }
 
     public void Close()
@@ -320,9 +322,11 @@ public class GkioPort
         if (knuPkt[2] == 0xaa) {
             SubCoin(knuPkt[3]);
         }
-
-        ReadGameInfo conf = ReadGameInfo.GetInstance();
-        InitWheel(pcvr.SteerValCen, (byte)conf.SteerForce);
+		
+		int steerForce = ReadGameInfo.SteerForceVal;
+		InitWheel(pcvr.SteerValCen, (byte)steerForce);
+//		ReadGameInfo conf = ReadGameInfo.GetInstance();
+//      InitWheel(pcvr.SteerValCen, (byte)conf.SteerForce);
 
         // knuPkt[4] 是气囊和开始灯
         setGascell(knuPkt[4]);

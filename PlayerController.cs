@@ -1,3 +1,4 @@
+#define QN_LIANXU_DOUDONG
 using UnityEngine;
 using System.Collections;
 using System;
@@ -404,8 +405,21 @@ public class PlayerController : MonoBehaviour
 	float mSteer;
 	float mSteerTimeCur;
 	float SteerOffset = 0.05f;
+	bool IsDownPowerPlayer;
+	float TimeLastDownPower;
 	void GetInput()
 	{
+		if (throttle > pcvr.mGetPower) {
+			IsDownPowerPlayer = true;
+			IsCheckDownYM = true;
+		}
+		else {
+			if (throttle < pcvr.mGetPower && Time.time - TimeLastDownPower > 0.1f) {
+				IsDownPowerPlayer = false;
+				TimeLastDownPower = Time.time;
+			}
+		}
+
 		throttle = pcvr.mGetPower;
 //		if (!IsClickShaCheBt) {
 //			throttle = pcvr.mGetPower;
@@ -563,10 +577,19 @@ public class PlayerController : MonoBehaviour
 			m_IsOffShuihua = true;
 		}
 	}
+	
 
 	float SpeedObj;
 	void OnGUI()
 	{
+		#if UNITY_EDITOR
+		string strT = "qnQ "+pcvr.m_IsOpneForwardQinang
+						+", qnH "+pcvr.m_IsOpneBehindQinang
+						+", qnZ "+pcvr.m_IsOpneLeftQinang
+						+", qnY "+pcvr.m_IsOpneRightQinang;
+		GUI.Label(new Rect(10f, 50f, Screen.width, 30f), strT);	
+		#endif
+
 		float wVal = Screen.width;
 		float hVal = 20f;
 		/*string strC = "m_IsOpneForwardQinang "+pcvr.m_IsOpneForwardQinang
@@ -641,11 +664,14 @@ public class PlayerController : MonoBehaviour
 			string strA = sp.ToString() + "km/h";
 			GUI.Box(new Rect(0f, 0f, wVal, hVal), strA);
 			
-			string strB = "throttle "+throttle.ToString("F3");
+			string strB = "throttle "+throttle.ToString("f3");
 			GUI.Box(new Rect(0f, hVal, wVal, hVal), strB);
 		}
 	}
 
+	float TimeLastThrot;
+	bool IsCheckDownYM;
+	static float DownYouMenSpeed = 80f;
 	public static float PlayerMinSpeedVal = 80f;
 	void CalculateEnginePower(bool canDrive)
 	{
@@ -653,12 +679,33 @@ public class PlayerController : MonoBehaviour
 			float speedVal = (m_pTopSpeed * throttle);
 			float tmp = (m_pTopSpeed - PlayerMinSpeedVal) / (1f - pcvr.YouMemnMinVal);
 			speedVal = m_pTopSpeed - (1f - throttle) * tmp;
-			speedVal = speedVal < PlayerMinSpeedVal ? PlayerMinSpeedVal : speedVal;
+			if (IsDownPowerPlayer) {
+				speedVal = speedVal < DownYouMenSpeed ? DownYouMenSpeed : speedVal;
+			}
+			else {
+				speedVal = speedVal < PlayerMinSpeedVal ? PlayerMinSpeedVal : speedVal;
+				if (speedVal < SpeedObj) {
+					speedVal = SpeedObj;
+				}
+			}
             //			if (!pcvr.bIsHardWare) {
             //				speedVal = 80f; //test
             //			}
             speedVal /= 3.2f;   //gzkun//3.6f;
 			rigidbody.velocity = speedVal * transform.forward;
+		}
+
+		if (throttle <= 0f && IsCheckDownYM && SpeedObj < 80f) {
+			float dTimeVal = Time.time - TimeLastThrot;
+			if (dTimeVal < 20f) {
+				float keyTmp = dTimeVal / 20f;
+				Vector2 speedVecTmp = Vector2.Lerp(new Vector2(DownYouMenSpeed / 3.6f, 0f), Vector2.zero, keyTmp);
+				rigidbody.velocity = speedVecTmp.x * transform.forward;
+			}
+		}
+		else {
+			DownYouMenSpeed = SpeedObj > 20f ? SpeedObj : 20f;
+			TimeLastThrot = Time.time;
 		}
 
 		if(m_IsPubu) {
@@ -704,6 +751,7 @@ public class PlayerController : MonoBehaviour
 		if(other.tag == "bianxian")
 		{
 			m_IsJiasu = false;
+			pcvr.GetInstance().OpenFangXiangPanZhenDong();
 		}
 		if(other.tag == "finish")
 		{
@@ -737,6 +785,7 @@ public class PlayerController : MonoBehaviour
 				m_CameraShake.setCameraShakeImpulseValue();
 				m_HitStone.Play();
 				Instantiate(m_HitEffectObj,transform.position,transform.rotation);
+				pcvr.GetInstance().OpenFangXiangPanZhenDong();
 			}
 		}
 		if(other.tag == "zhaoshi")
@@ -746,6 +795,7 @@ public class PlayerController : MonoBehaviour
 				m_IsHitshake = true;
 				m_PlayerAnimator.SetTrigger("IsZhuang");
 				m_CameraShake.setCameraShakeImpulseValue();
+				pcvr.GetInstance().OpenFangXiangPanZhenDong();
 				//m_HitStone.Play();
 				//GameObject temp = (GameObject)Instantiate(m_HitEffectObj,transform.position,transform.rotation);
 			}
@@ -759,6 +809,7 @@ public class PlayerController : MonoBehaviour
 				m_CameraShake.setCameraShakeImpulseValue();
 				m_HitStone.Play();
 				Instantiate(m_HitEffectObj,other.transform.position,other.transform.rotation);
+				pcvr.GetInstance().OpenFangXiangPanZhenDong();
 			}
 		}
         //gzknu
@@ -772,6 +823,7 @@ public class PlayerController : MonoBehaviour
 		if(other.tag == "feibananimtor")
 		{
 			m_PlayerAnimator.SetTrigger("IsQifei");
+			pcvr.GetInstance().OpenFangXiangPanZhenDong();
 		}
 		if(other.tag == "pubuanimtor")
 		{
@@ -790,6 +842,7 @@ public class PlayerController : MonoBehaviour
 			npc1.m_IsHit = true;
 			npc1.m_PlayerHit = transform.position;
 			npc1.m_NpcPos = npc1Pos.position;
+			pcvr.GetInstance().OpenFangXiangPanZhenDong();
 		}
 		if(other.tag == "npc2p")
 		{
@@ -804,6 +857,7 @@ public class PlayerController : MonoBehaviour
 			npc2.m_IsHit = true;
 			npc2.m_PlayerHit = transform.position;
 			npc2.m_NpcPos = npc2Pos.position;
+			pcvr.GetInstance().OpenFangXiangPanZhenDong();
 		}
 	}
 	public NpcController npc1;
@@ -840,6 +894,7 @@ public class PlayerController : MonoBehaviour
 		}
 		if(other.tag == "road")
 		{
+			m_IsHitshake = true;
 			m_IsOnRoad = true;
 		}
 		if(other.tag == "feiban")
@@ -996,54 +1051,51 @@ public class PlayerController : MonoBehaviour
 			m_partical[2].SetActive(true);
 		}
 	}
-	float m_HitshakeTimmerSet = 0.2f;
+
+	float m_HitshakeTimmerSet = 1.5f;
 	private float m_HitshakeTimmer = 0.0f;
 	private bool m_IsHitshake = false;
 	static bool IsHitRock = false;
+	float TimeHitVal;
 	void OnHitShake()
 	{
 		if(m_IsHitshake)
 		{
 			if(m_HitshakeTimmer<m_HitshakeTimmerSet)
 			{
-				TimeHitRock = 0f;
 				m_HitshakeTimmer+=Time.deltaTime;
-				if(m_HitshakeTimmer<m_HitshakeTimmerSet*0.25f || (m_HitshakeTimmer>=m_HitshakeTimmerSet*0.5f && m_HitshakeTimmer<m_HitshakeTimmerSet*0.75f))
-				{
-					pcvr.m_IsOpneForwardQinang = IsHitRock;
-					pcvr.m_IsOpneBehindQinang = IsHitRock;
-					pcvr.m_IsOpneLeftQinang = false;
+				TimeHitVal += Time.deltaTime;
+				float dTimeVal = 0.3f;
+				if (TimeHitVal < dTimeVal) {
+					pcvr.m_IsOpneForwardQinang = true;
+					pcvr.m_IsOpneBehindQinang = true;
+					pcvr.m_IsOpneLeftQinang = true;
 					pcvr.m_IsOpneRightQinang = true;
 				}
-				else if((m_HitshakeTimmer>=m_HitshakeTimmerSet*0.25f &&m_HitshakeTimmer<m_HitshakeTimmerSet*0.5f) || m_HitshakeTimmer>=m_HitshakeTimmerSet*0.75f)
-				{
-					pcvr.m_IsOpneForwardQinang = IsHitRock;
-					pcvr.m_IsOpneBehindQinang = IsHitRock;
-					pcvr.m_IsOpneLeftQinang = true;
+				else {
+					if (TimeHitVal > 2f*dTimeVal) {
+						TimeHitVal = 0f;
+					}
+					pcvr.m_IsOpneForwardQinang = false;
+					pcvr.m_IsOpneBehindQinang = false;
+					pcvr.m_IsOpneLeftQinang = false;
 					pcvr.m_IsOpneRightQinang = false;
 				}
 			}
 			else
 			{
-				TimeHitRock+=Time.deltaTime;
+				pcvr.CountQNZD++;
+				m_HitshakeTimmer = 0.0f;
+				m_IsHitshake = false;
+				IsHitRock = false;
+				pcvr.m_IsOpneForwardQinang = false;
+				pcvr.m_IsOpneBehindQinang = false;
 				pcvr.m_IsOpneLeftQinang = false;
 				pcvr.m_IsOpneRightQinang = false;
-				if (TimeHitRock >= 2f) {
-					pcvr.CountQNZD++;
-					TimeHitRock = 0f;
-					m_HitshakeTimmer = 0.0f;
-					m_IsHitshake = false;
-					IsHitRock = false;
-					pcvr.m_IsOpneForwardQinang = false;
-					pcvr.m_IsOpneBehindQinang = false;
-//					pcvr.m_IsOpneLeftQinang = false;
-//					pcvr.m_IsOpneRightQinang = false;
-				}
 			}
 			pcvr.GetInstance().OpenFangXiangPanZhenDong();
 		}
 	}
-	static float TimeHitRock;
 
 	void OnNpcHitPlayer()
 	{

@@ -1,4 +1,5 @@
 ﻿#define SHI_ZI_QI_NANG
+//#define OUT_INFO_TEST
 
 using UnityEngine;
 using System.Collections;
@@ -697,8 +698,9 @@ public class pcvr : MonoBehaviour {
 	public static bool IsSlowLoopCom = false;
 	IEnumerator PlayFangXiangPanZhenDong()
 	{
-		int count = UnityEngine.Random.Range(1, 4);
-		//count = 1; //test
+		int count = 100;
+		//int count = UnityEngine.Random.Range(1, 4);
+		//count = 100; //test
 		do {
 			IsZhenDongFangXiangPan = !IsZhenDongFangXiangPan;
 			count--;
@@ -868,18 +870,18 @@ public class pcvr : MonoBehaviour {
 	static bool IsHandleDirByKey = true;
 	public static void GetPcvrSteerVal()
 	{
-		if (!IsHandleDirByKey) {
-			if (!bIsHardWare) {
-				mGetSteer = Input.GetAxis("Horizontal");
-				return;
-			}
-		}
-		else {
+		if (IsHandleDirByKey) {
 			if (!bIsHardWare || IsTestGame) {
 				mGetSteer = Input.GetAxis("Horizontal");
 				return;
 			}
 		}
+		/*else {
+			if (!bIsHardWare || IsTestGame) {
+				mGetSteer = Input.GetAxis("Horizontal");
+				return;
+			}
+		}*/
 
 		if (!MyCOMDevice.IsFindDeviceDt) {
 			return;
@@ -931,14 +933,27 @@ public class pcvr : MonoBehaviour {
 		//Debug.Log("*** mGetSteer "+mGetSteer+", SteerValMax "+SteerValMax+", SteerValMin "+SteerValMin+", bikeDirCur "+bikeDirCur);
 	}
 
+#if OUT_INFO_TEST
+	void OnGUI()
+	{
+		string strA = "mGetSteer "+mGetSteer.ToString("f2")
+				+", SteerValCur "+SteerValCur
+				+", SteerValMax "+SteerValMax
+				+", SteerValMin "+SteerValMin
+				+", SteerValCen "+SteerValCen;
+		strA = "IsOpenFangXiangPanPower "+IsOpenFangXiangPanPower;
+		GUI.Label(new Rect(10f, 200f, Screen.width, 25f), strA);
+	}
+#endif
+
 	static float TimePowerLast;
 	static float TimePowerMax = 3f;
 	static float PowerLastVal;
 	static bool IsAddSpeed;
 	public static void GetPcvrPowerVal()
 	{
-		//if (!bIsHardWare) {
-		if (!bIsHardWare || IsTestGame) {
+		if (!bIsHardWare) {
+		//if (!bIsHardWare || IsTestGame) {
 			float valVer = Input.GetAxis("Vertical");
 			float powerTmp = 0f;
 			if (valVer > 0f) {
@@ -971,6 +986,7 @@ public class pcvr : MonoBehaviour {
 			}
 			powerTmp = powerTmp <= YouMemnMinVal ? 0f : powerTmp;
 			mGetPower = powerTmp;
+			mGetPower = 1f; //test.
 			return;
 		}
 
@@ -1332,7 +1348,12 @@ public class pcvr : MonoBehaviour {
         SteerValCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //fangXiang
 		bool isTest = false;
 		if (!isTest) {
-			BikePowerCur = ((buffer[2]&0x0f) << 8) + buffer[3]; //youMen
+			if (IsTestGame) {
+				BikePowerCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //用方向信息测试油门.
+			}
+			else {
+				BikePowerCur = ((buffer[2]&0x0f) << 8) + buffer[3]; //youMen
+			}
 			BikePowerCurPcvr = BikePowerCur;
 			
 			BikeShaCheCur = ((buffer[4]&0x0f) << 8) + buffer[5]; //shaChe
@@ -1395,25 +1416,27 @@ public class pcvr : MonoBehaviour {
             IsCloseDongGanBtDown = false;
 			InputEventCtrl.GetInstance().ClickCloseDongGanBt( ButtonState.UP );
 		}
-
-        //Debug.Log("KeyProcess() -> 6");
-        //if ( !bPlayerStartKeyDown && 0x01 == (buffer[28]&0x01) ) { //test
-        if ( !bPlayerStartKeyDown && 0x01 == (buffer[9]&0x01) ) {
-            //ScreenLog.Log("game startBt down!");
-            //Debug.Log("game startBt down!");
-            bPlayerStartKeyDown = true;
-			InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.DOWN );
+		
+		if (pcvr.bIsHardWare && !pcvr.IsTestGame) {
+			//Debug.Log("KeyProcess() -> 6");
+			//if ( !bPlayerStartKeyDown && 0x01 == (buffer[28]&0x01) ) { //test
+			if ( !bPlayerStartKeyDown && 0x01 == (buffer[9]&0x01) ) {
+				//ScreenLog.Log("game startBt down!");
+				//Debug.Log("game startBt down!");
+				bPlayerStartKeyDown = true;
+				InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.DOWN );
+			}
+			//else if ( bPlayerStartKeyDown && 0x00 == (buffer[28]&0x01) ) { //test
+			else if ( bPlayerStartKeyDown && 0x00 == (buffer[9]&0x01) ) {
+				//ScreenLog.Log("game startBt up!");
+				//Debug.Log("game startBt up!");
+				bPlayerStartKeyDown = false;
+				InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.UP );
+			}
 		}
-		//else if ( bPlayerStartKeyDown && 0x00 == (buffer[28]&0x01) ) { //test
-		else if ( bPlayerStartKeyDown && 0x00 == (buffer[9]&0x01) ) {
-            //ScreenLog.Log("game startBt up!");
-            //Debug.Log("game startBt up!");
-            bPlayerStartKeyDown = false;
-			InputEventCtrl.GetInstance().ClickStartBtOne( ButtonState.UP );
-		}
-
-        //Debug.Log("KeyProcess() -> 7");
-        if ( !bSetEnterKeyDown && 0x10 == (buffer[9]&0x10) ) {
+		
+		//Debug.Log("KeyProcess() -> 7");
+		if ( !bSetEnterKeyDown && 0x10 == (buffer[9]&0x10) ) {
 			bSetEnterKeyDown = true;
             //ScreenLog.Log("game setEnterBt down!");
             //Debug.Log("game setEnterBt down!");

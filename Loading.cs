@@ -74,7 +74,7 @@ public class Loading : MonoBehaviour
 			UpdateTex();
 		}
 
-		if (pcvr.bIsHardWare) {
+		if (pcvr.bIsHardWare && !pcvr.IsTestGame) {
 			if (GlobalData.CoinCur != m_InserNum && GameMode == "oper") {
 				m_InserNum = GlobalData.CoinCur - 1;
 				OnClickInsertBt();

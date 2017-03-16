@@ -69,7 +69,8 @@ public class SetPanel : MonoBehaviour
 			JiaoZhunObj = JiaoZhunTexture.gameObject;
 			JiaoZhunObj.SetActive(false);
 		}
-		
+		InitSteerForceInfo();
+
 		InputEventCtrl.GetInstance().ClickSetEnterBtEvent += ClickSetEnterBtEvent;
 		InputEventCtrl.GetInstance().ClickSetMoveBtEvent += ClickSetMoveBtEvent;
 		InputEventCtrl.GetInstance().ClickStartBtOneEvent += ClickStartBtOneEvent;
@@ -255,108 +256,119 @@ public class SetPanel : MonoBehaviour
         }
 
         m_IndexZhujiemian++;
-        if (m_IndexZhujiemian > 18)
-        {
+		if (m_IndexZhujiemian > (int)GameSet.Exit) {
             m_IndexZhujiemian = 0;
         }
-        switch (m_IndexZhujiemian)
+		GameSetSt = (GameSet)m_IndexZhujiemian;
+
+		switch (GameSetSt)
         {
-            case 0:
+			case GameSet.CoinStart:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-510.0f, 212.0f, 0.0f);
                     break;
                 }
-            case 1:
+			case GameSet.OperMode:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-640.0f, 139.0f, 0.0f);
                     break;
                 }
-            case 2:
+			case GameSet.FreeMode:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-278.0f, 139.0f, 0.0f);
                     break;
                 }
-            case 3:
+			case GameSet.ResetFactory:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-510.0f, 66.0f, 0.0f);
                     break;
                 }
-            case 4:
+            case GameSet.StartLEDLiang:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-510.0f, -4.5f, 0.0f);
                     break;
                 }
-            case 5:
+            case GameSet.StartLEDShan:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-385.0f, -4.5f, 0.0f);
                     break;
                 }
-            case 6:
+            case GameSet.StartLEDMie:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-253.0f, -4.5f, 0.0f);
                     break;
                 }
-            case 7:
+            case GameSet.CheckQiNang1:
 				{
 					CloseAllQiNang();
 					m_ZhujiemianXingXing.localPosition = new Vector3(-620.0f, -93.0f, 0.0f);
                     break;
                 }
-            case 8:
+            case GameSet.CheckQiNang2:
 				{
 					CloseAllQiNang();
 					m_ZhujiemianXingXing.localPosition = new Vector3(-620.0f, -125.0f, 0.0f);
                     break;
                 }
-            case 9:
+            case GameSet.CheckQiNang3:
 				{
 					CloseAllQiNang();
 					m_ZhujiemianXingXing.localPosition = new Vector3(-620.0f, -165.0f, 0.0f);
                     break;
                 }
-            case 10:
+            case GameSet.CheckQiNang4:
 				{
 					CloseAllQiNang();
 					m_ZhujiemianXingXing.localPosition = new Vector3(-620.0f, -200.0f, 0.0f);
                     break;
                 }
-            case 11:
+            case GameSet.GameAudioSet:
 				{
                     CloseAllQiNang();
 					m_ZhujiemianXingXing.localPosition = new Vector3(-575.0f, -285.0f, 0.0f);
                     break;
                 }
-            case 12:
+            case GameSet.GameAudioReset:
                 {
 					m_ZhujiemianXingXing.localPosition = new Vector3(-270.0f, -285.0f, 0.0f);
                     break;
                 }
-            case 13:
+            case GameSet.OriginalSpeed:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(-510.0f, -358.0f, 0.0f);
                     break;
                 }
-            case 14:
+            case GameSet.AdjustGame:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(56.0f, -81.0f, 0.0f);
                     break;
-                }
-            case 15:
+				}
+			case GameSet.SteerForceShiWei:
+				{
+					m_ZhujiemianXingXing.localPosition = new Vector3(157.0f, -197.0f, 0.0f);
+					break;
+				}
+			case GameSet.SteerForceGeWei:
+				{
+					m_ZhujiemianXingXing.localPosition = new Vector3(183.0f, -197.0f, 0.0f);
+					break;
+				}
+            case GameSet.GradeEasy:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(35.0f, -285.0f, 0.0f);
                     break;
                 }
-            case 16:
+            case GameSet.GradeNormal:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(235.0f, -285.0f, 0.0f);
                     break;
                 }
-            case 17:
+            case GameSet.GradeHard:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(450.0f, -285.0f, 0.0f);
                     break;
                 }
-            case 18:
+            case GameSet.Exit:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(56.0f, -358.0f, 0.0f);
                     break;
@@ -364,13 +376,92 @@ public class SetPanel : MonoBehaviour
         }
     }
 
+	enum GameSet
+	{
+		CoinStart,
+		OperMode,
+		FreeMode,
+		ResetFactory,
+		StartLEDLiang,
+		StartLEDShan,
+		StartLEDMie,
+		CheckQiNang1,
+		CheckQiNang2,
+		CheckQiNang3,
+		CheckQiNang4,
+		GameAudioSet,
+		GameAudioReset,
+		OriginalSpeed,
+		AdjustGame,
+		SteerForceShiWei,
+		SteerForceGeWei,
+		GradeEasy,
+		GradeNormal,
+		GradeHard,
+		Exit,
+	}
+	GameSet GameSetSt = GameSet.CoinStart;
+
+	int SteerForceShiWei = 2;
+	int SteerForceGeWei = 5;
+	public UILabel SteerForceLB;
+	void InitSteerForceInfo()
+	{
+		ReadGameInfo conf = ReadGameInfo.GetInstance();
+		SteerForceShiWei = conf.SteerForce / 10;
+		SteerForceGeWei = conf.SteerForce % 10;
+		SetSteerForceLBInfo(1);
+	}
+
+	void SetSteerForceShiWei()
+	{
+		SteerForceShiWei++;
+		if (SteerForceShiWei > 8) {
+			SteerForceShiWei = 0;
+		}
+
+		if (SteerForceShiWei == 8) {
+			SteerForceGeWei = 0;
+		}
+		SetSteerForceLBInfo();
+	}
+
+	void SetSteerForceGeWei()
+	{
+		if (SteerForceShiWei >= 8) {
+			return;
+		}
+
+		SteerForceGeWei++;
+		if (SteerForceGeWei > 9) {
+			SteerForceGeWei = 0;
+		}
+		SetSteerForceLBInfo();
+	}
+
+	void ResetSteerForce()
+	{
+		SteerForceShiWei = 2;
+		SteerForceGeWei = 5;
+		SetSteerForceLBInfo();
+	}
+
+	void SetSteerForceLBInfo(int key = 0)
+	{
+		if (key == 0) {
+			ReadGameInfo conf = ReadGameInfo.GetInstance();
+			conf.SteerForce = (SteerForceShiWei * 10) + SteerForceGeWei;
+		}
+		SteerForceLB.text = SteerForceShiWei.ToString() + SteerForceGeWei.ToString() + " (0-80)";
+	}
+
     void OnClickSelectBtInZhujiemian()
     {
         ReadGameInfo conf = ReadGameInfo.GetInstance();
 
-        switch (m_IndexZhujiemian)
+        switch (GameSetSt)
         {
-            case 0:  // 启动币数
+            case GameSet.CoinStart:  // 启动币数
                 {
                     int CoinNum = Convert.ToInt32(m_CoinForStar.text);
                     CoinNum++;
@@ -382,41 +473,41 @@ public class SetPanel : MonoBehaviour
                     conf.WriteStarCoinNumSet(CoinNum.ToString());
                     break;
                 }
-            case 1:  // 运营模式
+            case GameSet.OperMode:  // 运营模式
                 {
                     m_GameModeDuigou1.enabled = true;
                     m_GameModeDuigou2.enabled = false;
                     conf.WriteGameStarMode("oper");
                     break;
                 }
-            case 2:  // 免费模式
+            case GameSet.FreeMode:  // 免费模式
                 {
                     m_GameModeDuigou1.enabled = false;
                     m_GameModeDuigou2.enabled = true;
                     conf.WriteGameStarMode("FREE");
                     break;
                 }
-            case 3:  // 恢复出厂设置
+            case GameSet.ResetFactory:  // 恢复出厂设置
                 {
                     ResetFactory();
                     break;
                 }
-            case 4:  // 开始按键灯 - 亮
+            case GameSet.StartLEDLiang:  // 开始按键灯 - 亮
                 {
                     pcvr.StartBtLight = StartLightState.Liang;
                     break;
                 }
-            case 5:  // 开始按键灯 - 闪
+            case GameSet.StartLEDShan:  // 开始按键灯 - 闪
                 {
                     pcvr.StartBtLight = StartLightState.Shan;
                     break;
                 }
-            case 6:  // 开始按键灯 - 灭
+            case GameSet.StartLEDMie:  // 开始按键灯 - 灭
                 {
                     pcvr.StartBtLight = StartLightState.Mie;
                     break;
                 }
-            case 7:  // 气囊信息 - 前气囊
+            case GameSet.CheckQiNang1:  // 气囊信息 - 前气囊
                 {
                     pcvr.m_IsOpneForwardQinang = true;
                     pcvr.m_IsOpneBehindQinang = false;
@@ -424,7 +515,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = false;
                     break;
                 }
-            case 8:  // 气囊信息 - 后气囊
+			case GameSet.CheckQiNang2:  // 气囊信息 - 后气囊
                 {
                     pcvr.m_IsOpneForwardQinang = false;
                     pcvr.m_IsOpneBehindQinang = true;
@@ -432,7 +523,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = false;
                     break;
                 }
-            case 9:  // 气囊信息 - 左气囊
+			case GameSet.CheckQiNang3:  // 气囊信息 - 左气囊
                 {
                     pcvr.m_IsOpneForwardQinang = false;
                     pcvr.m_IsOpneBehindQinang = false;
@@ -440,7 +531,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = false;
                     break;
                 }
-            case 10: // 气囊信息 - 右气囊
+			case GameSet.CheckQiNang4: // 气囊信息 - 右气囊
                 {
                     pcvr.m_IsOpneForwardQinang = false;
                     pcvr.m_IsOpneBehindQinang = false;
@@ -448,7 +539,7 @@ public class SetPanel : MonoBehaviour
                     pcvr.m_IsOpneRightQinang = true;
                     break;
                 }
-			case 11:  // 音量设置 - <音量值>
+			case GameSet.GameAudioSet:  // 音量设置 - <音量值>
 				{
 					GameAudioVolume++;
 					if (GameAudioVolume > 10) {
@@ -458,14 +549,14 @@ public class SetPanel : MonoBehaviour
 					conf.WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
-			case 12:  // 音量设置 - 重置
+			case GameSet.GameAudioReset:  // 音量设置 - 重置
                 {
 					GameAudioVolume = 7;
 					GameAudioVolumeLB.text = GameAudioVolume.ToString();
 					conf.WriteGameAudioVolume(GameAudioVolume);
 					break;
 				}
-            case 13:  // 初始速度
+			case GameSet.OriginalSpeed:  // 初始速度
                 {
                     int speedVal = Convert.ToInt32(PlayerMinSpeed.text);
                     speedVal += 10;
@@ -477,13 +568,22 @@ public class SetPanel : MonoBehaviour
                     conf.WritePlayerMinSpeedVal(speedVal);
                     break;
                 }
-            case 14:  // 校准
+			case GameSet.AdjustGame:  // 校准
                 {
                     InitJiaoZhunPcvr();
                     break;
-                }
-
-            case 15:  // 难度 - 简单
+				}
+			case GameSet.SteerForceShiWei:
+				{
+					SetSteerForceShiWei();
+					break;
+				}
+			case GameSet.SteerForceGeWei:
+				{
+					SetSteerForceGeWei();
+					break;
+				}
+			case GameSet.GradeEasy:  // 难度 - 简单
 				{
 					GameGradeDuiGou[0].enabled = true;
 					GameGradeDuiGou[1].enabled = false;
@@ -492,7 +592,7 @@ public class SetPanel : MonoBehaviour
                     break;
                 }
 
-            case 16:  // 难度 - 正常
+			case GameSet.GradeNormal:  // 难度 - 正常
                 {
 					GameGradeDuiGou[0].enabled = false;
 					GameGradeDuiGou[1].enabled = true;
@@ -501,7 +601,7 @@ public class SetPanel : MonoBehaviour
                     break;
                 }
 
-            case 17:  // 难度 - 困难
+			case GameSet.GradeHard:  // 难度 - 困难
                 {
 					GameGradeDuiGou[0].enabled = false;
 					GameGradeDuiGou[1].enabled = false;
@@ -510,7 +610,7 @@ public class SetPanel : MonoBehaviour
                     break;
                 }
 
-            case 18:  // 退出
+			case GameSet.Exit:  // 退出
                 {
                     conf.Save();
                     CloseAllQiNang();
@@ -571,6 +671,7 @@ public class SetPanel : MonoBehaviour
                 GameGradeDuiGou[2].enabled = false;
                 break;
         }
+		ResetSteerForce();
     }
 
 	void ClickShaCheBtEvent(ButtonState val)

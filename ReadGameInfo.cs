@@ -277,10 +277,14 @@ public class ReadGameInfo : MonoBehaviour
 
     // SteerForce 是一个百分数的分子部分
     private int STEER_FORCE_ = Default_SteerForce;
+	public static int SteerForceVal = Default_SteerForce;
     public int SteerForce
     {
         get { return STEER_FORCE_; }
-        set { STEER_FORCE_ = Mathf.Clamp(value, 0, 100); }
+        set {
+			STEER_FORCE_ = Mathf.Clamp(value, 0, 100);
+			SteerForceVal = STEER_FORCE_;
+		}
     }
 
     void InitGameInfo()
