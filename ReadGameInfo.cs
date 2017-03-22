@@ -85,7 +85,7 @@ public class ReadGameInfo : MonoBehaviour
                     ThrustMin = int.TryParse(value, out tmp) ? tmp : Default_ThrustMin;
                     break;
                 case "ThrustMax":
-                    ThrustMax = int.TryParse(value, out tmp) ? tmp : Default_ThrustMax;
+					ThrustMax = int.TryParse(value, out tmp) ? tmp : Default_ThrustMax;
                     break;
                 case "BrakeMin":
                     BrakeMin = int.TryParse(value, out tmp) ? tmp : Default_BrakeMin;
@@ -226,14 +226,16 @@ public class ReadGameInfo : MonoBehaviour
     public int ThrustMin
     {
         get { return THRUST_MIN_; }
-        set { THRUST_MIN_ = Mathf.Clamp(value, 0, THRUST_MAX_); }
+        //set { THRUST_MIN_ = Mathf.Clamp(value, 0, THRUST_MAX_); } //对于油门反接的情况存在问题.
+		set { THRUST_MIN_ = Mathf.Clamp(value, 0, STM32_ADC_MAX); } //适配油门反接逻辑.
     }
 
     private int THRUST_MAX_ = Default_ThrustMax;
     public int ThrustMax
     {
         get { return THRUST_MAX_; }
-        set { THRUST_MAX_ = Mathf.Clamp(value, THRUST_MIN_, STM32_ADC_MAX); }
+		//set { THRUST_MAX_ = Mathf.Clamp(value, THRUST_MIN_, STM32_ADC_MAX); } //对于油门反接的情况存在问题.
+		set { THRUST_MAX_ = Mathf.Clamp(value, 0, STM32_ADC_MAX); } //适配油门反接逻辑.
     }
 
     private int BRAKE_MIN_ = Default_BrakeMin;     // BikeShaCheMin

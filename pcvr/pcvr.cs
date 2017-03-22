@@ -871,7 +871,8 @@ public class pcvr : MonoBehaviour {
 	public static void GetPcvrSteerVal()
 	{
 		if (IsHandleDirByKey) {
-			if (!bIsHardWare || IsTestGame) {
+			//if (!bIsHardWare || IsTestGame) {
+			if (!bIsHardWare) {
 				mGetSteer = Input.GetAxis("Horizontal");
 				return;
 			}
@@ -1091,7 +1092,7 @@ public class pcvr : MonoBehaviour {
 		IsJiaoZhunFireBt = false;
 		IsInitYouMenJiaoZhun = true;
 	}
-	
+
 	void ResetYouMenJiaoZhun()
 	{
 		if (!IsInitYouMenJiaoZhun) {
@@ -1116,7 +1117,8 @@ public class pcvr : MonoBehaviour {
 		}
 		BikePowerLen = Math.Max(1, BikePowerLen);
 
-        ReadGameInfo conf = ReadGameInfo.GetInstance();
+		ReadGameInfo conf = ReadGameInfo.GetInstance();
+
         conf.ThrustMax = (int)mBikePowerMax;
 		conf.ThrustMin = (int)mBikePowerMin;
 	}
@@ -1240,21 +1242,16 @@ public class pcvr : MonoBehaviour {
 
 	void YouMenJiaoZhun()
 	{
-        ReadGameInfo conf = ReadGameInfo.GetInstance();
-
         if (!IsInitYouMenJiaoZhun) {
 			return;
 		}
 
 		if (BikePowerCur < mBikePowerMin) {
 			mBikePowerMin = BikePowerCur;
-            conf.ThrustMin = (int)mBikePowerMin;
-
         }
 		
 		if (BikePowerCur > mBikePowerMax) {
 			mBikePowerMax = BikePowerCur;
-            conf.ThrustMax = (int)mBikePowerMax;
         }
 		
 		if (bPlayerStartKeyDown && !IsJiaoZhunFireBt) {
@@ -1348,12 +1345,13 @@ public class pcvr : MonoBehaviour {
         SteerValCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //fangXiang
 		bool isTest = false;
 		if (!isTest) {
-			if (IsTestGame) {
-				BikePowerCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //用方向信息测试油门.
-			}
-			else {
-				BikePowerCur = ((buffer[2]&0x0f) << 8) + buffer[3]; //youMen
-			}
+//			if (IsTestGame) {
+//				BikePowerCur = ((buffer[6]&0x0f) << 8) + buffer[7]; //用方向信息测试油门.
+//			}
+//			else {
+//				BikePowerCur = ((buffer[2]&0x0f) << 8) + buffer[3]; //youMen
+//			}
+			BikePowerCur = ((buffer[2]&0x0f) << 8) + buffer[3]; //youMen
 			BikePowerCurPcvr = BikePowerCur;
 			
 			BikeShaCheCur = ((buffer[4]&0x0f) << 8) + buffer[5]; //shaChe
