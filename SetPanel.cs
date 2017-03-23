@@ -101,6 +101,7 @@ public class SetPanel : MonoBehaviour
                 GameGradeDuiGou[2].enabled = false;
                 break;
         }
+		InitGameLanguage();
     }
 
 	void Update () 
@@ -345,19 +346,24 @@ public class SetPanel : MonoBehaviour
 				}
 			case GameSet.SteerForceShiWei:
 				{
-					m_ZhujiemianXingXing.localPosition = new Vector3(157.0f, -197.0f, 0.0f);
+					m_ZhujiemianXingXing.localPosition = new Vector3(157.0f, -170.0f, 0.0f);
 					break;
 				}
 			case GameSet.SteerForceGeWei:
 				{
-					m_ZhujiemianXingXing.localPosition = new Vector3(183.0f, -197.0f, 0.0f);
+					m_ZhujiemianXingXing.localPosition = new Vector3(177.0f, -170.0f, 0.0f);
+					break;
+				}
+			case GameSet.GameLanguage:
+				{
+					m_ZhujiemianXingXing.localPosition = new Vector3(56.0f, -182.0f, 0.0f);
 					break;
 				}
             case GameSet.GradeEasy:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(35.0f, -285.0f, 0.0f);
                     break;
-                }
+				}
             case GameSet.GradeNormal:
                 {
                     m_ZhujiemianXingXing.localPosition = new Vector3(235.0f, -285.0f, 0.0f);
@@ -395,6 +401,7 @@ public class SetPanel : MonoBehaviour
 		AdjustGame,
 		SteerForceShiWei,
 		SteerForceGeWei,
+		GameLanguage,
 		GradeEasy,
 		GradeNormal,
 		GradeHard,
@@ -583,6 +590,11 @@ public class SetPanel : MonoBehaviour
 					SetSteerForceGeWei();
 					break;
 				}
+			case GameSet.GameLanguage:
+				{
+					ChangeGameLanguage();
+					break;
+				}
 			case GameSet.GradeEasy:  // 难度 - 简单
 				{
 					GameGradeDuiGou[0].enabled = true;
@@ -625,6 +637,29 @@ public class SetPanel : MonoBehaviour
         }
     }
 #endif
+	
+	/**
+	 * GameLanguageObj[0] -> 中文.
+	 * GameLanguageObj[1] -> 英文.
+	 */
+	public GameObject[] GameLanguageObj;
+	void InitGameLanguage()
+	{
+		int indexVal = (ReadGameInfo.GetInstance().Language == GameTextType.Chinese ? 0 : 1);
+		for (int i = 0; i < 2; i++) {
+			GameLanguageObj[i].SetActive(i == indexVal ? true : false);
+		}
+	}
+
+	void ChangeGameLanguage()
+	{
+		for (int i = 0; i < 2; i++) {
+			GameLanguageObj[i].SetActive(!GameLanguageObj[i].activeSelf);
+			if (GameLanguageObj[i].activeSelf) {
+				ReadGameInfo.GetInstance().Language = (GameTextType)i;
+			}
+		}
+	}
 
 	public UILabel GameAudioVolumeLB;
 	void CloseAllQiNang()
