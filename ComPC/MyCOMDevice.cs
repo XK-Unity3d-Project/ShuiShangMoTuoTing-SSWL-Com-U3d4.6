@@ -82,7 +82,7 @@ public class GkioPort
         }
     }
 
-    private static byte[] wbuf = new byte[16];
+//    private static byte[] wbuf = new byte[16];
     private static byte[] rbuf = new byte[16];
 
     // 扣币
@@ -168,7 +168,8 @@ public class GkioPort
         CMD_SET_WHEEL[5] = 0x02;
 
         // 返回的 rbuf[0] 应该是 0x21
-        int ret = gkio_write_read(CMD_SET_WHEEL, rbuf);
+        //int ret = gkio_write_read(CMD_SET_WHEEL, rbuf);
+        gkio_write_read(CMD_SET_WHEEL, rbuf);
     }
 
     // force 在 0 到 100 之间
@@ -536,7 +537,7 @@ public class MyCOMDevice : MonoBehaviour
 		public static byte[] ReadByteMsg = new byte[BufLenRead];
 		public static byte[] WriteByteMsg = new byte[BufLenWrite];
 		static string RxStringData;
-		static string _NewLine = "ABCD"; //0x41 0x42 0x43 0x44
+//		static string _NewLine = "ABCD"; //0x41 0x42 0x43 0x44
 		public static int ReadTimeout = 0x0050; //单位为毫秒.
 		public static int WriteTimeout = 0x07d0;
 		public static bool IsStopComTX;
@@ -774,10 +775,10 @@ public class MyCOMDevice : MonoBehaviour
 	void CheckTimeOutReadMsg()
 	{
 		ReadMsgTimeOutVal += TimeUnitDelta;
-		float timeMinVal = CountOpenCom < 6 ? 0.5f : 4f;
+		/*float timeMinVal = CountOpenCom < 6 ? 0.5f : 4f;
 		if (CountOpenCom > 20) {
 			timeMinVal = 10f;
-		}
+		}*/
 
         /* czq
 		if (ReadMsgTimeOutVal > timeMinVal) {
@@ -800,8 +801,8 @@ public class MyCOMDevice : MonoBehaviour
         */
 	}
 
-	void Update()
-	{
+//	void Update()
+//	{
 		//test...
 //		if (Input.GetKeyUp(KeyCode.T)) {
 //			ForceRestartComPort();
@@ -811,16 +812,16 @@ public class MyCOMDevice : MonoBehaviour
 //		}
 		//test end...
 		
-		if (!pcvr.bIsHardWare || XkGameCtrl.IsLoadingLevel || ComThreadClass.IsReadComMsg) {
-			return;
-		}
-		
-		if (Time.realtimeSinceStartup - TimeLastVal < TimeUnitDelta) {
-			return;
-		}
-		TimeLastVal = Time.realtimeSinceStartup;
-		CheckTimeOutReadMsg();
-	}
+//		if (!pcvr.bIsHardWare || XkGameCtrl.IsLoadingLevel || ComThreadClass.IsReadComMsg) {
+//			return;
+//		}
+//		
+//		if (Time.realtimeSinceStartup - TimeLastVal < TimeUnitDelta) {
+//			return;
+//		}
+//		TimeLastVal = Time.realtimeSinceStartup;
+//		CheckTimeOutReadMsg();
+//	}
 
 //	void OnGUI()
 //	{
