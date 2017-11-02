@@ -529,8 +529,8 @@ public class MyCOMDevice : MonoBehaviour
     public class ComThreadClass
 	{
 		public string ThreadName;
-        //static SerialPort _SerialPortTmp;
-        private static GkioPort _SerialPort;
+        static SerialPort _SerialPort;
+        //private static GkioPort _SerialPort;
         public static int BufLenRead = 27;
 		public static int BufLenReadEnd = 4;
 		public static  int BufLenWrite = 23;
@@ -565,8 +565,8 @@ public class MyCOMDevice : MonoBehaviour
 				return;
 			}
 
-            //_SerialPort = new SerialPort(ComPortName, 38400, Parity.None, 8, StopBits.One);
-            _SerialPort = new GkioPort();
+            _SerialPort = new SerialPort(ComPortName, 38400, Parity.None, 8, StopBits.One);
+            //_SerialPort = new GkioPort();
 			if (_SerialPort != null)
 			{
 				try
@@ -760,21 +760,21 @@ public class MyCOMDevice : MonoBehaviour
 		}
 	}
 
-	void RestartComPort()
-	{
-		if (!ComThreadClass.IsReadMsgComTimeOut) {
-			return;
-		}
-		CountRestartCom++;
-		CountOpenCom++;
-		ScreenLog.Log("Restart ComPort "+ComThreadClass.ComPortName+", time "+(int)Time.realtimeSinceStartup);
-		ScreenLog.Log("CountRestartCom: "+CountRestartCom);
-		StartCoroutine(OpenComThread());
-	}
+	//void RestartComPort()
+	//{
+	//	if (!ComThreadClass.IsReadMsgComTimeOut) {
+	//		return;
+	//	}
+	//	CountRestartCom++;
+	//	CountOpenCom++;
+	//	ScreenLog.Log("Restart ComPort "+ComThreadClass.ComPortName+", time "+(int)Time.realtimeSinceStartup);
+	//	ScreenLog.Log("CountRestartCom: "+CountRestartCom);
+	//	StartCoroutine(OpenComThread());
+	//}
 
-	void CheckTimeOutReadMsg()
-	{
-		ReadMsgTimeOutVal += TimeUnitDelta;
+	//void CheckTimeOutReadMsg()
+	//{
+	//	ReadMsgTimeOutVal += TimeUnitDelta;
 		/*float timeMinVal = CountOpenCom < 6 ? 0.5f : 4f;
 		if (CountOpenCom > 20) {
 			timeMinVal = 10f;
@@ -787,11 +787,11 @@ public class MyCOMDevice : MonoBehaviour
 			RestartComPort();
 		}
         */
-	}
+	//}
 
 	// 强制重启串口通讯,目的是清理串口缓存信息.
-	public void ForceRestartComPort()
-	{
+	//public void ForceRestartComPort()
+	//{
         /*
 		if (!pcvr.bIsHardWare) {
 			return;
@@ -799,7 +799,7 @@ public class MyCOMDevice : MonoBehaviour
 		ComThreadClass.IsReadMsgComTimeOut = true;
 		RestartComPort();
         */
-	}
+	//}
 
 //	void Update()
 //	{

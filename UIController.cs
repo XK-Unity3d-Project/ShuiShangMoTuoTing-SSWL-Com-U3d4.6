@@ -203,9 +203,9 @@ public class UIController : MonoBehaviour
 			}
 			if(m_CongratulateTimmer>5.0f)
 			{
-				if (pcvr.bIsHardWare) {
-					MyCOMDevice.GetInstance().ForceRestartComPort();
-				}
+				//if (pcvr.bIsHardWare) {
+				//	MyCOMDevice.GetInstance().ForceRestartComPort();
+				//}
 				XkGameCtrl.IsLoadingLevel = true;
 				LoadMovieLevel();
 			}
